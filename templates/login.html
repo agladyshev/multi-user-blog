@@ -1,0 +1,25 @@
+<h2>Login</h2>
+
+<container style="display: flex; margin: 0">
+
+    <form method="post" style="width: 20rem; text-align: right">
+        
+        <span>Username</span>
+        <input type="text" name="username" value="{{username}}">
+        <br>
+        <span>Password</span>
+        <input type="password" name="password" value="">
+        <br>
+        <br>
+        <button>Submit</button>
+       
+    </form>
+
+    <div style="width: 50vw; color: red">
+        <span>{{username_error}}</span>
+        <br>
+        <span>{{password_error}}</span>
+        <br>
+    </div>
+
+</container>

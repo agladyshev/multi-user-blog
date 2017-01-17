@@ -1,0 +1,9 @@
+{% extends "main.html" %}
+
+{% block content %}
+
+{% for blog in blogs %}
+  {{blog.render() | safe}}
+{% endfor %}
+
+{% endblock %}

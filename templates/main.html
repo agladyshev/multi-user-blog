@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+<head>
+
+  <meta name="description" content="Udacity Responsive Images course project" />
+  <meta name="author" content="//samdutton.com">
+  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
+  <meta itemprop="name" content="Udacity Responsive Images course project">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta id="theme-color" name="theme-color" content="#307699">
+  <meta charset="utf-8"/>
+  
+  <title>My responsive blog</title>
+
+  <link rel="stylesheet" href="css/main.css" type="text/css">
+  <link href="https://fonts.googleapis.com/css?family=Lora" rel="stylesheet">
+
+</head>
+
+<body>
+  <header>
+    <a href="/"><h1>My responsive blog</h1></a>
+    <hr>
+  </header>
+  <article>
+    {% block content %}
+    {% endblock %}
+  </article>
+  <footer>
+    <hr>
+    <div class="social">
+      <a class="zocial-twitter icon" href="//twitter.com/" title="View my Twitter page" id="viewTwitter"> Twitter</a>
+      <a class="zocial-digg icon" href="//digg.com/" title="View my page on Digg" id="viewDigg"> Digg</a>
+      <a class="zocial-facebook icon" href="//facebook.com/" title="View my Facebook page" id="viewFacebook"> Facebook</a>
+      <a class="zocial-googleplus icon" href="//twitter.com/" title="View my Google+ page" id="viewGoogle+"> Google+</a>
+    </div>
+    <div class="github">
+        <span>View source for this page on</span>
+        <a class="zocial-github" href="//github.com/udacity/responsive-images/tree/master/project/start" title="View source for this page on GitHub" id="viewSource"></a>
+    </div>
+  </footer>
+</body>
+</html>

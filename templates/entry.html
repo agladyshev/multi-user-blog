@@ -1,0 +1,13 @@
+<section class="blog">
+  <div class="blog-heading">
+    <div class="blog-title">
+      {{blog.subject}}
+    </div>
+    <div class="blog-date">
+      {{blog.created.strftime("%b %d, %Y")}}
+    </div>
+  </div>
+  <div class="blog-content">
+    {{blog._render_text | safe}}
+  </div>
+</section>
