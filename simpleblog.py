@@ -294,9 +294,8 @@ class LoginPage(Handler):
 class Logout(Handler):
 
     def get(self):
-        self.response.headers.add_header(
-            'Set-Cookie', 'name =; Path=/')
-        self.redirect("/signup")
+        self.logout()
+        self.redirect('/signup')
 
 
 class WelcomePage(Handler):
