@@ -46,7 +46,7 @@ def make_pw_hash(password):
 #     if not salt:
 #         salt = make_salt()
 #     h = hashlib.sha256(pw + salt).hexdigest()
-#     return '%s,%s' % (salt, h)    
+#     return '%s,%s' % (salt, h)
 
 
 def valid_pw(password, hashed):
@@ -78,8 +78,8 @@ class Handler(webapp2.RequestHandler):
     def login(self, user):
         self.set_secure_cookie('user_id', str(user.key().id()))
 
-
-    # def logout(self):
+    def logout(self):
+        self.response.headers.add_header('Set-Cookie', 'user_id=; Path=/')
 
     def initialize(self, *a, **kw):
         webapp2.RequestHandler.initialize(self, *a, **kw)
@@ -155,30 +155,31 @@ class PostPage(MainPage):
 
 
 class User(db.Model):
-    username = db.StringProperty(required=True)
+    name = db.StringProperty(required=True)
     pw_hash = db.StringProperty(required=True)
     email = db.StringProperty()
     created = db.DateTimeProperty(auto_now_add=True)
 
     @classmethod
     def by_id(cls, uid):
-        return User.get_by_id(uid)
+        return cls.get_by_id(uid)
 
     @classmethod
-    def by_name(cls, username):
-        u = User.all().filter('username =', username).get()
+    def by_name(cls, name):
+        u = cls.all().filter('name =', name).get()
         return u
 
     @classmethod
-    def register(cls, username, password, email=None):
+    def register(cls, name, password, email=None):
         pw_hash = make_pw_hash(password)
-        return User(username=username,
+
+        return cls(name=name,
                     pw_hash=pw_hash,
                     email=email)
 
     @classmethod
-    def login(cls, username, password):
-        u = cls.by_name(username)
+    def login(cls, name, password):
+        u = cls.by_name(name)
         if u and valid_pw(password, u.pw_hash):
             return u
 
@@ -191,7 +192,7 @@ class Register(Handler):
 
     def post(self):
 
-        self.username = self.request.get("username")
+        self.name = self.request.get("name")
         self.password = self.request.get("password")
         self.verify = self.request.get("verify")
         self.email = self.request.get("email")
@@ -200,17 +201,17 @@ class Register(Handler):
         PASS_RE = re.compile(r"^.{3,20}$")
         MAIL_RE = re.compile(r"^[\S]+@[\S]+.[\S]+$")
 
-        username_valid = USER_RE.match(self.username)
+        name_valid = USER_RE.match(self.name)
         password_valid = PASS_RE.match(self.password)
         email_valid = MAIL_RE.match(self.email)
 
         is_error = False
 
-        params = dict(username=self.username, email=self.email)
+        params = dict(name=self.name, email=self.email)
 
-        if not username_valid:
+        if not name_valid:
             is_error = True
-            params['username_error'] = "Not a valid username!"
+            params['username_error'] = "Not a valid name!"
 
         if not password_valid:
             is_error = True
@@ -230,15 +231,15 @@ class Register(Handler):
             self.success()
 
     def success(self):
-        #make sure user doesn't already exist
-        u = User.by_name(self.username)
+        # make sure user doesn't already exist
+        u = User.by_name(self.name)
         if u:
             self.render("signup.html",
-                        username_error = "User with that name already exists")
+                        username_error="User with that name already exists")
         else:
-            u = User.register(username=self.username,
-                 password=self.password,
-                 email=self.email)
+            u = User.register(name=self.name,
+                              password=self.password,
+                              email=self.email)
             u.put()
             self.login(u)
             self.redirect("/welcome")
@@ -252,48 +253,58 @@ class LoginPage(Handler):
 
     def post(self):
 
-        username = self.request.get("username")
+        name = self.request.get("name")
         password = self.request.get("password")
-
-        username_valid = User.gql(
-            "WHERE username = :username", username=username).get()
-        password_valid = User.gql(
-            "WHERE username = :username AND password = :password", username=username, password=password).get()
-
-        is_error = False
-
-        params = dict(username=username)
-
-        if not username_valid:
-            is_error = True
-            params['username_error'] = "There is no user with that name!"
+        
+        u = User.login(name, password)
+        if u:
+            self.login(u)
+            self.redirect('/welcome')
         else:
-            if not password_valid:
-                is_error = True
-                params['password_error'] = "Wrong password!"
+            self.render('login.html', error = "Invalid login")
 
-        if is_error:
-            self.render("login.html", **params)
-        else:
-            self.response.headers.add_header(
-                'Set-Cookie', 'username = %s; Path=/' % str(username))
-            self.redirect("/welcome")
+        # name_valid = User.gql(
+        #     "WHERE name = :name", name=name).get()
+        # password_valid = User.gql(
+        #     "WHERE name = :name AND password = :password",
+        #     name=name,
+        #     password=password
+        # ).get()
+
+        # is_error = False
+
+        # params = dict(name=name)
+
+        # if not name_valid:
+        #     is_error = True
+        #     params['username_error'] = "There is no user with that name!"
+        # else:
+        #     if not password_valid:
+        #         is_error = True
+        #         params['password_error'] = "Wrong password!"
+
+        # if is_error:
+        #     self.render("login.html", **params)
+        # else:
+        #     self.response.headers.add_header(
+        #         'Set-Cookie', 'name = %s; Path=/' % str(name))
+        #     self.redirect("/welcome")
 
 
 class Logout(Handler):
 
     def get(self):
         self.response.headers.add_header(
-            'Set-Cookie', 'username =; Path=/')
+            'Set-Cookie', 'name =; Path=/')
         self.redirect("/signup")
 
 
 class WelcomePage(Handler):
 
     def get(self):
-        #refers to initialize function in Handler
+        # refers to initialize function in Handler
         if self.user:
-            self.render("welcome.html", username=self.user.username)
+            self.render("welcome.html", name=self.user.name)
         else:
             self.redirect('/signup')
 
