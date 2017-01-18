@@ -1,12 +1,12 @@
 import os
 import webapp2
 import jinja2
-import bcrypt
 import re
 import random
-from string import letters
 import hashlib
 import hmac
+from string import letters
+from pybcrypt import bcrypt
 
 from google.appengine.ext import db
 
@@ -17,7 +17,6 @@ jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_dir),
 
 
 secret = 'QM8DcZ8ThA7*se9MIyqFCBbV8A3QTU5!4DgD508Cq268Th42'
-#super_secret = '8SE1SL8Wror8I9F2$aV30j7s1e69!O7WE414k!iD!0Mh^0**'
 
 
 def render_str(template, **params):
@@ -37,16 +36,6 @@ def check_secure_val(secure_val):
 
 def make_pw_hash(password):
     return bcrypt.hashpw(password, bcrypt.gensalt())
-
-
-# def make_salt(length = 5):
-#     return ''.join(random.choice(letters) for x in xrange(length))
-
-# def make_pw_hash(pw, salt = None):
-#     if not salt:
-#         salt = make_salt()
-#     h = hashlib.sha256(pw + salt).hexdigest()
-#     return '%s,%s' % (salt, h)
 
 
 def valid_pw(password, hashed):
@@ -87,10 +76,6 @@ class Handler(webapp2.RequestHandler):
         self.user = uid and User.by_id(int(uid))
 
 
-# def blog_key(name = 'default'):
-#     return db.Key.from_path('blogs', name)
-
-
 class Blog(db.Model):
     subject = db.StringProperty(required=True)
     content = db.TextProperty(required=True)
@@ -100,58 +85,6 @@ class Blog(db.Model):
     def render(self):
         self._render_text = self.content.replace('\n', '<br>')
         return render_str("entry.html", blog=self)
-
-
-class MainPage(Handler):
-
-    def render_main(self, subject="", content="", error=""):
-
-        blogs = db.GqlQuery(
-            "SELECT * FROM Blog ORDER BY created DESC limit 10")
-        # blogs = Blog.all().order('-created')
-        self.render(
-            "blog.html", blogs=blogs)
-
-    def get(self):
-
-        self.render_main()
-
-
-class NewPost(Handler):
-
-    def get(self):
-
-        self.render("form.html")
-
-    def post(self):
-
-        subject = self.request.get("subject")
-        content = self.request.get("content")
-
-        if subject and content:
-            b = Blog(subject=subject, content=content)
-            b.put()
-            blog_id = b.key().id()
-            self.redirect("/%d" % blog_id)
-        else:
-            error = "We need both a subject and some text!"
-            self.render(
-                "form.html", subject=subject, content=content, error=error)
-
-
-class PostPage(MainPage):
-
-    def get(self, blog_id):
-        """
-        When you use " (\d+) ", it sends this number as a parameter
-        (of type string) to the get or post methods from PermaLink
-        """
-        blog = Blog.get_by_id(int(blog_id))
-        if not blog:
-            self.error(404)
-            return
-
-        self.render("blog.html", blogs=[blog])
 
 
 class User(db.Model):
@@ -174,14 +107,66 @@ class User(db.Model):
         pw_hash = make_pw_hash(password)
 
         return cls(name=name,
-                    pw_hash=pw_hash,
-                    email=email)
+                   pw_hash=pw_hash,
+                   email=email)
 
     @classmethod
     def login(cls, name, password):
         u = cls.by_name(name)
         if u and valid_pw(password, u.pw_hash):
             return u
+
+
+class MainPage(Handler):
+
+    def render_main(self, subject="", content="", error=""):
+
+        blogs = db.GqlQuery(
+            "SELECT * FROM Blog ORDER BY created DESC limit 10")
+        # blogs = Blog.all().order('-created')
+        self.render(
+            "blog.html", blogs=blogs)
+
+    def get(self):
+
+        self.render_main()
+
+
+class NewPost(Handler):
+
+    def get(self):
+
+        self.render("newpost.html")
+
+    def post(self):
+
+        subject = self.request.get("subject")
+        content = self.request.get("content")
+
+        if subject and content:
+            b = Blog(subject=subject, content=content)
+            b.put()
+            blog_id = b.key().id()
+            self.redirect("/%d" % blog_id)
+        else:
+            error = "We need both a subject and some text!"
+            self.render(
+                "newpost.html", subject=subject, content=content, error=error)
+
+
+class PostPage(MainPage):
+
+    def get(self, blog_id):
+        """
+        When you use " (\d+) ", it sends this number as a parameter
+        (of type string) to the get or post methods from PermaLink
+        """
+        blog = Blog.get_by_id(int(blog_id))
+        if not blog:
+            self.error(404)
+            return
+
+        self.render("postpage.html", blog=blog)
 
 
 class Register(Handler):
@@ -245,7 +230,7 @@ class Register(Handler):
             self.redirect("/welcome")
 
 
-class LoginPage(Handler):
+class Login(Handler):
 
     def get(self):
 
@@ -255,40 +240,13 @@ class LoginPage(Handler):
 
         name = self.request.get("name")
         password = self.request.get("password")
-        
+
         u = User.login(name, password)
         if u:
             self.login(u)
             self.redirect('/welcome')
         else:
-            self.render('login.html', error = "Invalid login")
-
-        # name_valid = User.gql(
-        #     "WHERE name = :name", name=name).get()
-        # password_valid = User.gql(
-        #     "WHERE name = :name AND password = :password",
-        #     name=name,
-        #     password=password
-        # ).get()
-
-        # is_error = False
-
-        # params = dict(name=name)
-
-        # if not name_valid:
-        #     is_error = True
-        #     params['username_error'] = "There is no user with that name!"
-        # else:
-        #     if not password_valid:
-        #         is_error = True
-        #         params['password_error'] = "Wrong password!"
-
-        # if is_error:
-        #     self.render("login.html", **params)
-        # else:
-        #     self.response.headers.add_header(
-        #         'Set-Cookie', 'name = %s; Path=/' % str(name))
-        #     self.redirect("/welcome")
+            self.render('login.html', error="Invalid login")
 
 
 class Logout(Handler):
@@ -312,7 +270,7 @@ app = webapp2.WSGIApplication([('/', MainPage),
                                ('/newpost', NewPost),
                                ('/(\d+)', PostPage),
                                ('/signup', Register),
-                               ('/login', LoginPage),
+                               ('/login', Login),
                                ('/logout', Logout),
                                ('/welcome', WelcomePage)
                                ],
