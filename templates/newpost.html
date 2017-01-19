@@ -12,7 +12,7 @@
   <label>
     <h3>Blog</h3>
     <textarea type="text" name="content" value="{{content}}">
-    </textarea>    
+    </textarea>
   </label>
   <div class="submit">
     <button>Submit</button>
@@ -20,6 +20,34 @@
   <div class="error">{{error}}</div>    
 
 </form>
+
+<div class="row column">
+  <form method="post" class="login small-centered column">
+    <div class="row column">
+      <label>Username
+        <input class="login__input" type="text" name="name" value="{{name}}">
+      </label>
+    </div>
+    <div class="row column">
+      <label>Password
+        <input class="login__input" type="password" name="password" value="">
+      </label>
+    </div>
+    <div class="row column text-left">
+    {% if error %}
+      <span class="form-error is-visible">
+      {{error}}
+      </span>
+      {% endif %}
+    </div>
+    <div class="row">
+      <fieldset class="column text-right">
+        <button class="small hollow button" type="submit" value="Submit">Submit</button>
+      </fieldset>
+    </div>
+  </form>
+</div>
+
 
 
 {% endblock %}

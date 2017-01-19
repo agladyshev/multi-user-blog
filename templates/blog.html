@@ -21,7 +21,7 @@
 
   </div>
 </nav>
-<main>
+<main class="row column">
   {% for blog in blogs %}
     {{blog.render() | safe}}
   {% endfor %}

@@ -1,13 +1,17 @@
-<article class="blog">
-  <div class="blog-heading">
-    <div class="blog-title">
-      {{blog.subject}}
+<article class="row column">
+  <div class="row">
+    <div class="small-6 column">
+      <h2>{{blog.subject}}</h2>
     </div>
-    <div class="blog-date">
+    <div class="small-6 column text-right">
       {{blog.created.strftime("%b %d, %Y")}}
     </div>
+    
   </div>
-  <div class="blog-content">
+  <div class="row column">
+    <h5 class="subheader">by {{blog.author.name}}</h5>
+  </div>
+  <div class="small-12 column">
     {{blog._render_text | safe}}
   </div>
 </article>

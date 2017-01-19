@@ -76,17 +76,6 @@ class Handler(webapp2.RequestHandler):
         self.user = uid and User.by_id(int(uid))
 
 
-class Blog(db.Model):
-    subject = db.StringProperty(required=True)
-    content = db.TextProperty(required=True)
-    created = db.DateTimeProperty(auto_now_add=True)
-    last_modified = db.DateTimeProperty(auto_now=True)
-
-    def render(self):
-        self._render_text = self.content.replace('\n', '<br>')
-        return render_str("entry.html", blog=self)
-
-
 class User(db.Model):
     name = db.StringProperty(required=True)
     pw_hash = db.StringProperty(required=True)
@@ -117,6 +106,18 @@ class User(db.Model):
             return u
 
 
+class Blog(db.Model):
+    subject = db.StringProperty(required=True)
+    content = db.TextProperty(required=True)
+    created = db.DateTimeProperty(auto_now_add=True)
+    last_modified = db.DateTimeProperty(auto_now=True)
+    author = db.ReferenceProperty(User, required=True)
+
+    def render(self):
+        self._render_text = self.content.replace('\n', '<br>')
+        return render_str("entry.html", blog=self)
+
+
 class MainPage(Handler):
 
     def render_main(self, subject="", content="", error=""):
@@ -137,7 +138,10 @@ class NewPost(Handler):
 
     def get(self):
 
-        self.render("newpost.html")
+        if self.user:
+            self.render("newpost.html")
+        else:
+            self.redirect("/login")
 
     def post(self):
 
@@ -145,7 +149,7 @@ class NewPost(Handler):
         content = self.request.get("content")
 
         if subject and content:
-            b = Blog(subject=subject, content=content)
+            b = Blog(subject=subject, content=content, author=self.user)
             b.put()
             blog_id = b.key().id()
             self.redirect("/%d" % blog_id)

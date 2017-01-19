@@ -23,16 +23,22 @@ h1 {
 
 header {
   padding-top: 2rem;
-  /*background-image: linear-gradient( white, #bfd8d2);
-*/
+  background-image: linear-gradient( white, #bfd8d2);
+
 }
 
-/*nav {
-  background-image: linear-gradient( #bfd8d2, white);
+nav {
+  background-image: linear-gradient( white, #bfd8d2);
+  padding: 0.5rem;
 }
-*/
+
 footer {
   padding-bottom: 2rem;
+}
+
+article {
+  background-image: linear-gradient( white, #bfd8d2);
+  padding-top: 1rem;
 }
 
 
