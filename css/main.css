@@ -1,27 +1,91 @@
-/*
-
-Your styles go here!
-
-Hint! You'll probably want to start by styling:
-  * <body>
-  * <article>
-  * <h1>
-  * <img>
-
-I've left some boilerplate below for you.
-
-*/
-
-
 @import url(http://weloveiconfonts.com/api/?family=zocial);
 
-  /* zocial */
+/*implementing zocial font for social media icons*/
+
 [class*="zocial-"]:before {
-  font-family: 'zocial', sans-serif;
+  font-family: "zocial", sans-serif;
+}
+
+body {
+  font-family: Raleway;
+  font-weight: 400; 
+
+}
+
+a {
+  color: black;
+}
+
+h1 {
+  font-weight: 200;
+  line-height: 0.8;
+}
+
+header {
+  padding-top: 2rem;
+  /*background-image: linear-gradient( white, #bfd8d2);
+*/
+}
+
+/*nav {
+  background-image: linear-gradient( #bfd8d2, white);
+}
+*/
+footer {
+  padding-bottom: 2rem;
 }
 
 
-body {
+.login {
+  max-width: 20rem;
+}
+
+.signup {
+  max-width: 20rem;
+}
+
+.login__input, .signup__input {
+  max-width: 12rem;
+}
+
+.uppercase {
+  text-transform: uppercase;
+}
+
+.link-hover:hover .icon-hover {
+  fill: #02b3e4;
+  /*change the color of svg path in icon on mouse hover*/
+    /*CSS validator will throw an error, because svg properties
+    are not yet included to CSS*/
+  }
+
+  @media screen and (max-width: 639px) {
+
+  }
+
+  @media screen and (min-width: 640px) and (max-width: 1023px) {
+    
+  }
+
+  @media screen and (min-width: 1024px) {
+    body {
+      font-size: 20px;
+    }
+
+    footer {
+      font-size: 16px;
+    }
+  }
+
+
+
+
+
+
+
+
+
+/*body {
 	margin-left: auto;
 	margin-right: auto;
 	font-size: 18px;
@@ -170,5 +234,5 @@ a {
 .submit {
   margin: 1rem;
   text-align: right;
-}
+}*/
 

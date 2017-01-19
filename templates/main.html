@@ -1,43 +1,61 @@
 <!doctype html>
-<html>
-<head>
+<html class="no-js" lang="en" dir="ltr">
+  <head>
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Udacity Full Stack Nanodegree project" />
+    <meta itemprop="name" content="Udacity Full Stack Nanodegree project">
+    <meta name="author" content="//github.com/agladyshev">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta charset="utf-8"/>
+    
+    <title>fabl.er</title>
+    <link href="https://fonts.googleapis.com/css?family=Raleway:200,400" rel="stylesheet">
+    <link rel="stylesheet" href="css/foundation/foundation.css">
+    <link rel="stylesheet" href="css/main.css" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Lora" rel="stylesheet">
+  </head>
 
-  <meta name="description" content="Udacity Responsive Images course project" />
-  <meta name="author" content="//samdutton.com">
-  <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1.0, user-scalable=yes">
-  <meta itemprop="name" content="Udacity Responsive Images course project">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta id="theme-color" name="theme-color" content="#307699">
-  <meta charset="utf-8"/>
-  
-  <title>My responsive blog</title>
+  <body>
+    <header class="row expanded">
+      <div class="row">
+        <div class="small-10 column">
+          <a href="/"><h1>fabl.er</h1></a>
+        </div>
+        <div class="small-2 column text-right">
+          <button class="menu-icon" type="button" data-toggle="menuBar"></button> 
+        </div>
+        <hr>
+      </div>
+    </header>
 
-  <link rel="stylesheet" href="css/main.css" type="text/css">
-  <link href="https://fonts.googleapis.com/css?family=Lora" rel="stylesheet">
-
-</head>
-
-<body>
-  <header>
-    <a href="/"><h1>My responsive blog</h1></a>
-    <hr>
-  </header>
-  <article>
     {% block content %}
+    
     {% endblock %}
-  </article>
-  <footer>
-    <hr>
-    <div class="social">
-      <a class="zocial-twitter icon" href="//twitter.com/" title="View my Twitter page" id="viewTwitter"> Twitter</a>
-      <a class="zocial-digg icon" href="//digg.com/" title="View my page on Digg" id="viewDigg"> Digg</a>
-      <a class="zocial-facebook icon" href="//facebook.com/" title="View my Facebook page" id="viewFacebook"> Facebook</a>
-      <a class="zocial-googleplus icon" href="//twitter.com/" title="View my Google+ page" id="viewGoogle+"> Google+</a>
-    </div>
-    <div class="github">
+
+    <footer class="row text-center">
+      <hr class="row column">
+      <div id="social" class="small-12 large-6 column" >
+        <div class="row small-up-2 large-up-4">
+          <a class="zocial-facebook column" href="//facebook.com/profile.php?id=100010168684021" title="View my Facebook page" id="viewFacebook" target="_blank"> Facebook</a>
+          <a class="zocial-linkedin column" href="//linkedin.com/" title="View my LinkedIn page" id="viewGoogle+" target="_blank"> LinkedIn</a>
+          <a class="zocial-github column" href="//github.com/agladyshev" title="View my GitHub page" id="viewGithub" target="_blank"> GitHub</a>
+          <a class="column link-hover" href="https://profiles.udacity.com/u/alexeygladyshev" title="View my Udacity page" id="viewUdacity" target="_blank">
+            <!--SVG image is used inline to get an access to its internal properties, fill color here. Color changes when we hover the mouse over the icon. This way, svg fully imitates font icon behaviour.-->
+            <svg id="svg1" viewBox="0 -8 35 35" width="1em" height="1.2em">
+              <path class="icon-hover" fill="#000000" fill-rule="evenodd" d="M29 .1l-9 4.7v14.9c0 .6 0 1.3-.2 1.9-.1.6-.3 1.2-.5 1.7-.1.1-.1.3-.2.4-.3 0-2.5-.7-3.5-1.4-.4-.3-.8-.6-1.2-1-.4-.4-.7-.8-1-1.2-.3-.4-.6-.9-.8-1.4-.2-.5-.4-1-.5-1.6-.1-.5-.1-1.1-.1-1.6V1.2L10 0 0 5.9v13.7C0 25.9 5.1 31 11.3 31c2.1 0 4-.5 5.7-1.5l8.4-4.8c3.3-1.7 5.6-5.2 5.6-9.1V1.3L29 .1zM17.9 26.2c-.9.9-1.6 1.4-2.6 1.9-.6.2-1.3.5-1.9.7-.6.1-1.2.2-1.8.2-.6 0-1.6-.1-2.2-.2-.6-.1-1.2-.3-1.7-.5s-1.1-.5-1.6-.9c-1.3-.9-1.9-1.7-2.5-2.5-.3-.5-.6-1-.9-1.6-.2-.6-.4-1.1-.5-1.7-.2-.7-.2-1.4-.2-2V7.1l8-4.7v13.1c0 5 3.7 9.1 8.4 10.1-.2.2-.3.4-.5.6zm11-9c-.1.5-.3 1-.5 1.5s-.6 1.2-1 1.7c-.6.7-1.2 1.2-2.7 2.1-1.3.7-2.4.9-3.1 1.1.5-1.2.5-2.5.5-3.9L22 6l7-3.7v13.3c0 .5 0 1.1-.1 1.6z"/>
+            </svg>
+            Udacity
+          </a>
+        </div>
+      </div>
+      <div class="small-12 large-6 column end">
         <span>View source for this page on</span>
-        <a class="zocial-github" href="//github.com/udacity/responsive-images/tree/master/project/start" title="View source for this page on GitHub" id="viewSource"></a>
-    </div>
-  </footer>
-</body>
+        <a class="zocial-github" href="//github.com/agladyshev/FSND-portfolio" title="View source for this page on GitHub" target="_blank"></a>
+      </div>
+    </footer>
+    <script src="js/vendor/jquery.js"></script>
+    <script src="js/vendor/what-input.js"></script>
+    <script src="js/vendor/foundation.js"></script>
+  </body>
 </html>

@@ -124,8 +124,9 @@ class MainPage(Handler):
         blogs = db.GqlQuery(
             "SELECT * FROM Blog ORDER BY created DESC limit 10")
         # blogs = Blog.all().order('-created')
+
         self.render(
-            "blog.html", blogs=blogs)
+            "blog.html", blogs=blogs, auth_status=self.user)
 
     def get(self):
 
@@ -253,7 +254,7 @@ class Logout(Handler):
 
     def get(self):
         self.logout()
-        self.redirect('/signup')
+        self.redirect('/')
 
 
 class WelcomePage(Handler):

@@ -1,22 +1,32 @@
-<h2>Login</h2>
+{% extends "main.html" %}
 
-<container style="display: flex; margin: 0">
+{% block content %}
 
-    <form method="post" style="width: 20rem; text-align: right">
-        
-        <span>Username</span>
-        <input type="text" name="name" value="{{name}}">
-        <br>
-        <span>Password</span>
-        <input type="password" name="password" value="">
-        <br>
-        <br>
-        <button>Submit</button>
-        <div style="color: red; text-align: center">
-            <span>{{error}}</span>
-        </div> 
-    </form>
+<div class="row column">
+  <form method="post" class="login small-centered column">
+    <div class="row column">
+      <label>Username
+        <input class="login__input" type="text" name="name" value="{{name}}">
+      </label>
+    </div>
+    <div class="row column">
+      <label>Password
+        <input class="login__input" type="password" name="password" value="">
+      </label>
+    </div>
+    <div class="row column text-left">
+    {% if error %}
+      <span class="form-error is-visible">
+      {{error}}
+      </span>
+      {% endif %}
+    </div>
+    <div class="row">
+      <fieldset class="column text-right">
+        <button class="small hollow button" type="submit" value="Submit">Submit</button>
+      </fieldset>
+    </div>
+  </form>
+</div>
 
-    
-
-</container>
+{% endblock %}

@@ -2,8 +2,33 @@
 
 {% block content %}
 
-{% for blog in blogs %}
-  {{blog.render() | safe}}
-{% endfor %}
+<nav id="menuBar" class="row expanded" data-toggler=".hide">
+  <!--row is expanded to full vw to place gradient-->
+  <div class="row">
+    <!--div takes 100% width, so we use row class with max-width 1200px to center content-->
+    {% if not auth_status %}
+      <ul class="menu small-12 column simple text-right">
+        <li><a href="/login">Login</a></li>
+        <li><a href="/signup">Signup</a></li>
+      </ul>
+    {% else %}
+      <ul class="menu small-12 column simple text-left">
+        <li><a href="/">My blog</a></li>
+        <li><a href="/newpost">Create</a></li>
+        <li><a href="/logout">Logout</a></li>
+      </ul>
+    {% endif %}
+
+  </div>
+</nav>
+<main>
+  {% for blog in blogs %}
+    {{blog.render() | safe}}
+  {% endfor %}
+</main>
 
 {% endblock %}
+
+
+
+

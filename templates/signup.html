@@ -1,35 +1,67 @@
-<h2>Signup</h2>
+{% extends "main.html" %}
 
-<container style="display: flex; margin: 0">
+{% block content %}
 
-	<form method="post" style="width: 20rem; text-align: right">
-	    
-	    <span>Username</span>
-	    <input type="text" name="name" value="{{name}}">
-	    <br>
-	    <span>Password</span>
-	    <input type="password" name="password" value="">
-	    <br>
-	    <span>Verify Password</span>
-	    <input type="password" name="verify" value="">
-	    <br>
-	    <span>Email (optional)</span>
-	    <input type="text" name="email" value="{{email}}">
-	    <br>
-	    <br>
-	    <button>Submit</button>
-	   
-	</form> 
+<div class="row column">
+  <form method="post" class="signup small-centered column">
+    <div class="row">
+      <div class="small-12 columns">
+        <label>Username
+          <input class="signup__input" type="text" name="name" value="{{name}}"placeholder="" aria-describedby="exampleHelpText">
+          {% if username_error %}
+          <span class="form-error is-visible">
+          {{username_error}}
+          </span>
+          {% endif %}
+        </label>
+        <p class="help-text" id="exampleHelpText">At least 3 characters long!</p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="small-12 columns">
+        <label>Password
+          <input class="signup__input" type="password" name="password" value=""placeholder="" aria-describedby="exampleHelpText">
+          {% if password_error %}
+          <span class="form-error is-visible">
+          {{password_error}}
+          </span>
+          {% endif %}
+        </label>
+        <p class="help-text" id="exampleHelpText"></p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="small-12 columns">
+        <label>Verify password
+          <input class="signup__input" type="password" name="verify" value="" placeholder="" aria-describedby="exampleHelpText">
+          {% if verify_error %}
+          <span class="form-error is-visible">
+          {{verify_error}}
+          </span>
+          {% endif %}
+        </label>
+        <p class="help-text" id="exampleHelpText"></p>
+      </div>
+    </div>
+    <div class="row">
+      <div class="small-12 columns">
+        <label>Email (optional)
+          <input class="signup__input" type="text" name="email" value="{{email}}" placeholder="" aria-describedby="exampleHelpText">
+          {% if email_error %}
+          <span class="form-error is-visible">
+          {{email_error}}
+          </span>
+          {% endif %}
+        </label>
+        <p class="help-text" id="exampleHelpText">We won't spam you</p>
+      </div>
+    </div>
+    <div class="row">
+      <fieldset class="column text-right">
+        <button class="small hollow button" type="submit" value="Submit">Submit</button>
+      </fieldset>
+    </div>
+  </form>
+</div>
+{% endblock %}
 
-	<div style="width: 50vw; color: red">
-		<span>{{username_error}}</span>
-		<br>
-		<span>{{password_error}}</span>
-		<br>
-		<span>{{verify_error}}</span>
-		<br>
-		<span>{{email_error}}</span>
-		<br>
-	</div>
-
-</container>
