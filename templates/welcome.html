@@ -1,1 +1,12 @@
- <h2>Welcome to the site, {{name}}</h2>
+{% extends "main.html" %}
+
+{% block content %}
+
+<div class="row column text-center">
+	<h3>Welcome to the site, {{name}}</h3>
+	<button class="button hollow small">
+		<a href="/">Continue to blog</a>
+	</button>
+</div>
+
+{% endblock %}

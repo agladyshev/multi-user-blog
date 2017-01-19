@@ -113,9 +113,12 @@ class Blog(db.Model):
     last_modified = db.DateTimeProperty(auto_now=True)
     author = db.ReferenceProperty(User, required=True)
 
-    def render(self):
+    def render(self, current_user=None):
+        owner = False
+        if current_user:
+            owner = self.author.key().id() == current_user.key().id()
         self._render_text = self.content.replace('\n', '<br>')
-        return render_str("entry.html", blog=self)
+        return render_str("entry.html", blog=self, owner=owner)
 
 
 class MainPage(Handler):
@@ -127,7 +130,7 @@ class MainPage(Handler):
         # blogs = Blog.all().order('-created')
 
         self.render(
-            "blog.html", blogs=blogs, auth_status=self.user)
+            "blog.html", blogs=blogs, current_user=self.user)
 
     def get(self):
 
@@ -163,15 +166,17 @@ class PostPage(MainPage):
 
     def get(self, blog_id):
         """
-        When you use " (\d+) ", it sends this number as a parameter
-        (of type string) to the get or post methods from PermaLink
+        When you use " (\d+) ", app sends this number as a parameter
+        (of type string) to the get or post methods
         """
         blog = Blog.get_by_id(int(blog_id))
         if not blog:
             self.error(404)
             return
 
-        self.render("postpage.html", blog=blog)
+
+
+        self.render("postpage.html", blog=blog, current_user=self.user)
 
 
 class Register(Handler):
@@ -271,12 +276,54 @@ class WelcomePage(Handler):
             self.redirect('/signup')
 
 
+class EditPost(Handler):
+
+    def get(self, blog_id):
+        """
+        When you use " (\d+) ", app sends this number as a parameter
+        (of type string) to the get or post methods
+        """
+        blog = Blog.get_by_id(int(blog_id))
+        if not blog:
+            self.error(404)
+            return
+        owner = False
+        if self.user and blog.author.key().id() == self.user.key().id():
+            self.render("edit.html", blog=blog)
+        else:
+            self.error(401)
+            return
+
+    def post(self, blog_id):
+
+        subject = self.request.get("subject")
+        content = self.request.get("content")
+
+        if subject and content:
+            blog = Blog.get_by_id(int(blog_id))
+            blog.subject = subject
+            blog.content = content
+            blog.put()
+            blog_id = blog.key().id()
+            self.redirect("/%d" % blog_id)
+        else:
+            blog = Blog.get_by_id(int(blog_id))
+            if self.user and blog.author.key().id() == self.user.key().id():
+                blog.delete()
+                self.redirect("/")
+            else:
+                self.error(401)
+                return
+
+
+
 app = webapp2.WSGIApplication([('/', MainPage),
                                ('/newpost', NewPost),
                                ('/(\d+)', PostPage),
                                ('/signup', Register),
                                ('/login', Login),
                                ('/logout', Logout),
-                               ('/welcome', WelcomePage)
+                               ('/welcome', WelcomePage),
+                               ('/edit/(\d+)', EditPost),
                                ],
                               debug=True)

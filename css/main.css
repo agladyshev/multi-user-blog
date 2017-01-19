@@ -23,13 +23,13 @@ h1 {
 
 header {
   padding-top: 2rem;
-  background-image: linear-gradient( white, #bfd8d2);
+/*  background-image: linear-gradient( white, #bfd8d2);*/
 
 }
 
 nav {
-  background-image: linear-gradient( white, #bfd8d2);
-  padding: 0.5rem;
+  /*background-image: linear-gradient( white, #bfd8d2);*/
+  /*padding: 0.5rem;*/
 }
 
 footer {
@@ -37,7 +37,7 @@ footer {
 }
 
 article {
-  background-image: linear-gradient( white, #bfd8d2);
+/*  background-image: linear-gradient( white, #bfd8d2);*/
   padding-top: 1rem;
 }
 
@@ -58,6 +58,14 @@ article {
   text-transform: uppercase;
 }
 
+.edit__icon {
+  
+}
+
+.edit__discard, .edit__delete {
+  padding: 1rem;
+}
+
 .link-hover:hover .icon-hover {
   fill: #02b3e4;
   /*change the color of svg path in icon on mouse hover*/
@@ -66,14 +74,17 @@ article {
   }
 
   @media screen and (max-width: 639px) {
+    .blog__text {
+      padding: 0 0.7rem;
+    }
 
   }
 
-  @media screen and (min-width: 640px) and (max-width: 1023px) {
+  @media screen and (min-width: 640px) and (max-width: 959px) {
     
   }
 
-  @media screen and (min-width: 1024px) {
+  @media screen and (min-width: 50rem) {
     body {
       font-size: 20px;
     }

@@ -2,6 +2,10 @@
 
 {% block content %}
 
-{{blog.render() | safe}}
+{% if current_user %}
+  {{blog.render(current_user) | safe}}
+{% else %}
+  {{blog.render() | safe}}
+{% endif %}
 
 {% endblock %}
