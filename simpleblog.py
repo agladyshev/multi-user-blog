@@ -75,6 +75,12 @@ class Handler(webapp2.RequestHandler):
         uid = self.read_secure_cookie('user_id')
         self.user = uid and User.by_id(int(uid))
 
+    def is_owner(self, blog):
+        #check if logged in user is an author of a blog
+        if self.user and blog.author.key().id() == self.user.key().id():
+            return True
+
+
 
 class User(db.Model):
     name = db.StringProperty(required=True)
@@ -119,6 +125,15 @@ class Blog(db.Model):
             owner = self.author.key().id() == current_user.key().id()
         self._render_text = self.content.replace('\n', '<br>')
         return render_str("entry.html", blog=self, owner=owner)
+
+    @classmethod
+    def by_id(cls, uid):
+        return cls.get_by_id(uid)
+
+
+class Like(db.Model):
+    blog = db.ReferenceProperty(Blog, required=True)
+    author = db.ReferenceProperty(User, required=True)
 
 
 class MainPage(Handler):
@@ -169,7 +184,7 @@ class PostPage(MainPage):
         When you use " (\d+) ", app sends this number as a parameter
         (of type string) to the get or post methods
         """
-        blog = Blog.get_by_id(int(blog_id))
+        blog = Blog.by_id(int(blog_id))
         if not blog:
             self.error(404)
             return
@@ -283,12 +298,12 @@ class EditPost(Handler):
         When you use " (\d+) ", app sends this number as a parameter
         (of type string) to the get or post methods
         """
-        blog = Blog.get_by_id(int(blog_id))
+        blog = Blog.by_id(int(blog_id))
         if not blog:
             self.error(404)
             return
         owner = False
-        if self.user and blog.author.key().id() == self.user.key().id():
+        if self.is_owner(blog):
             self.render("edit.html", blog=blog)
         else:
             self.error(401)
@@ -300,15 +315,15 @@ class EditPost(Handler):
         content = self.request.get("content")
 
         if subject and content:
-            blog = Blog.get_by_id(int(blog_id))
+            blog = Blog.by_id(int(blog_id))
             blog.subject = subject
             blog.content = content
             blog.put()
             blog_id = blog.key().id()
             self.redirect("/%d" % blog_id)
         else:
-            blog = Blog.get_by_id(int(blog_id))
-            if self.user and blog.author.key().id() == self.user.key().id():
+            blog = Blog.by_id(int(blog_id))
+            if self.is_owner(blog):
                 blog.delete()
                 self.redirect("/")
             else:
