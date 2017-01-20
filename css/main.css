@@ -7,13 +7,13 @@
 }
 
 html {
-  background: url("img/debut_light.png");
+  /*background: url("img/debut_light.png");*/
 }
 
 body {
   font-family: Raleway;
   font-weight: 400; 
-  background: url("img/debut_light.png");
+/*  background: url("img/debut_light.png");*/
 
 }
 

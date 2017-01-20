@@ -194,9 +194,9 @@ class MainPage(Handler):
 
     def render_main(self):
 
-        blogs = db.GqlQuery(
-            "SELECT * FROM Blog ORDER BY created DESC limit 10")
-        # blogs = Blog.all().order('-created')
+        # blogs = db.GqlQuery(
+        #     "SELECT * FROM Blog ORDER BY created DESC limit 10")
+        blogs = Blog.all().order('-created')
 
         self.render(
             "blog.html", blogs=blogs, current_user=self.user)
@@ -220,6 +220,12 @@ class MainPage(Handler):
                 l = Like(author=self.user, blog=blog)
                 l.put()
         self.render_main()
+
+
+# class PageNum(MainPage):
+
+#     def render_main(self, num):
+#         self.render_main()
         
 
 class NewPost(Handler):

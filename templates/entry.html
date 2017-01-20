@@ -25,7 +25,9 @@
     <hr>
     <div class="row">
       <div class="small-6 column">
-        {% if owner is none %}
+      {% if not owner %}
+      {% if owner is none %}
+        <div class="row column">
           <a class="link-hover" href="/login">
             <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" viewBox="0 0 100 100"><path class="icon-hover" fill="#000000" d="M67.607 13.462A22.1 22.1 0 0 0 50 22.136a22.098 22.098 0 0 0-17.61-8.674c-12.266 0-22.283 10.013-22.33 22.32-.046 13.245 6.359 21.054 11.507 27.331l1.104 1.349c6.095 7.515 24.992 21.013 25.792 21.584a2.654 2.654 0 0 0 3.077 0c.8-.571 19.697-14.069 25.792-21.584l1.103-1.349c5.147-6.277 11.553-14.086 11.507-27.331-.048-12.307-10.066-22.32-22.335-22.32z"/></svg>
             Like
@@ -33,27 +35,48 @@
               {{likes.count()}}
             {% endif %}
           </a>
-        </a>
-        {% else %}
-        <form method="post">
-          <input type="hidden" name="blog_id" value="{{blog.key().id()}}">
-          <button type="submit" class="link-hover">
-            <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" viewBox="0 0 100 100"><path class="icon-hover" fill="#000000" d="M67.607 13.462A22.1 22.1 0 0 0 50 22.136a22.098 22.098 0 0 0-17.61-8.674c-12.266 0-22.283 10.013-22.33 22.32-.046 13.245 6.359 21.054 11.507 27.331l1.104 1.349c6.095 7.515 24.992 21.013 25.792 21.584a2.654 2.654 0 0 0 3.077 0c.8-.571 19.697-14.069 25.792-21.584l1.103-1.349c5.147-6.277 11.553-14.086 11.507-27.331-.048-12.307-10.066-22.32-22.335-22.32z"/></svg>
-            <a>Like
-            {% if likes.count() %}
-              {{likes.count()}}
-            {% endif %}
-            </a>
-          </button>
-        </form>
+        </div>
+      {% else %}
+        <div class="row column">
+          <form method="post">
+            <input type="hidden" name="blog_id" value="{{blog.key().id()}}">
+            <button type="submit" class="link-hover">
+              <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" viewBox="0 0 100 100"><path class="icon-hover" fill="#000000" d="M67.607 13.462A22.1 22.1 0 0 0 50 22.136a22.098 22.098 0 0 0-17.61-8.674c-12.266 0-22.283 10.013-22.33 22.32-.046 13.245 6.359 21.054 11.507 27.331l1.104 1.349c6.095 7.515 24.992 21.013 25.792 21.584a2.654 2.654 0 0 0 3.077 0c.8-.571 19.697-14.069 25.792-21.584l1.103-1.349c5.147-6.277 11.553-14.086 11.507-27.331-.048-12.307-10.066-22.32-22.335-22.32z"/></svg>
+              <a>Like
+              {% if likes.count() %}
+                {{likes.count()}}
+              {% endif %}
+              </a>
+            </button>
+          </form>
+        </div>
         {% endif %}
-
-
-        
-
-
-
+      {% else %}
+        <div class="row">
+          <div class="link-hover small-12 column" href="/login">
+            <button data-toggle-focus="likeError" class="link-hover">
+              <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" viewBox="0 0 100 100"><path class="icon-hover" fill="#000000" d="M67.607 13.462A22.1 22.1 0 0 0 50 22.136a22.098 22.098 0 0 0-17.61-8.674c-12.266 0-22.283 10.013-22.33 22.32-.046 13.245 6.359 21.054 11.507 27.331l1.104 1.349c6.095 7.515 24.992 21.013 25.792 21.584a2.654 2.654 0 0 0 3.077 0c.8-.571 19.697-14.069 25.792-21.584l1.103-1.349c5.147-6.277 11.553-14.086 11.507-27.331-.048-12.307-10.066-22.32-22.335-22.32z"/></svg>
+              <a>Like
+              {% if likes.count() %}
+                {{likes.count()}}
+              {% endif %}
+              </a>
+            </button>
+          </div>
+          <div class="small-12 column">
+            <label class="label warning is-hidden text-left" id="likeError" data-toggler="is-hidden">
+              You can't like your own posts
+            </label>
+          </div>
+        </div>
+      {% endif %}
       </div>
+
+    
+
+
+
+      
       <div class="small-6 column text-right">
         {{blog.created.strftime("%b %d, %Y")}}
       </div>
@@ -70,8 +93,24 @@
     <div class="comments small-10 column small-centered">
 
       {% for comment in comments %}
+          {% if loop.index == 4 %}
+          <div class="hide" id="hiddenComments" data-toggler=".hide">
+          {% endif %}
         
-          {{comment.render() | safe}}
+            {{comment.render() | safe}}
+
+          {% if loop.last %}
+          </div class="hide">
+          <div class="row">
+            <div class="small-6 medium-3 column small-centered">
+              <button name="showMore" class="button hollow small" data-toggle="hiddenComments">Show more
+              </button>
+            </div>
+          </div>
+
+          {% endif %}
+
+
         
       {% endfor %}
       {% if owner is none %}
