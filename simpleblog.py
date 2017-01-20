@@ -165,7 +165,7 @@ class Comment(db.Model):
     @classmethod
     def by_blog_id(cls, blog_id):
         blog = Blog.by_id(blog_id)
-        comments = cls.all().filter('blog =', blog)
+        comments = cls.all().filter('blog =', blog).order("created")
         return comments
             
 
