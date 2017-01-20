@@ -5,6 +5,7 @@ import re
 import random
 import hashlib
 import hmac
+import logging
 from string import letters
 from pybcrypt import bcrypt
 
@@ -119,16 +120,45 @@ class Blog(db.Model):
     last_modified = db.DateTimeProperty(auto_now=True)
     author = db.ReferenceProperty(User, required=True)
 
+    def get_comments(self):
+        blog_id = int(self.key().id())
+        c = Comment.by_blog_id(blog_id)
+        return c
+
     def render(self, current_user=None):
         owner = False
         if current_user:
             owner = self.author.key().id() == current_user.key().id()
         self._render_text = self.content.replace('\n', '<br>')
-        return render_str("entry.html", blog=self, owner=owner)
+        comments = self.get_comments()
+        return render_str("entry.html", blog=self, owner=owner, comments=comments)
 
     @classmethod
     def by_id(cls, uid):
         return cls.get_by_id(uid)
+
+
+class Comment(db.Model):
+    author = db.ReferenceProperty(User, required=True)
+    blog = db.ReferenceProperty(Blog, required=True)
+    content = db.StringProperty(required=True)
+    created = db.DateTimeProperty(auto_now_add=True)
+
+    def render(self, current_user=None):
+        # owner = False
+        # if current_user:
+        #     owner = self.author.key().id() == current_user.key().id()
+        self._render_text = self.content.replace('\n', '<br>')
+        # return render_str("comments.html", comments=self, owner=owner)
+        return render_str("comment.html", comment=self)
+
+    @classmethod
+    def by_blog_id(cls, blog_id):
+        blog = Blog.by_id(blog_id)
+        comments = cls.all().filter('blog =', blog)
+        return comments
+            
+
 
 
 class Like(db.Model):
@@ -138,7 +168,7 @@ class Like(db.Model):
 
 class MainPage(Handler):
 
-    def render_main(self, subject="", content="", error=""):
+    def render_main(self):
 
         blogs = db.GqlQuery(
             "SELECT * FROM Blog ORDER BY created DESC limit 10")
@@ -151,6 +181,14 @@ class MainPage(Handler):
 
         self.render_main()
 
+    def post(self):
+        comment = self.request.get("comment")
+        blog_id = self.request.get("blog_id")
+        blog = Blog.by_id(int(blog_id))
+        c = Comment(content=comment, author=self.user, blog=blog)
+        c.put()
+        self.render_main()
+        
 
 class NewPost(Handler):
 

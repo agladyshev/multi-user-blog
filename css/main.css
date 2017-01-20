@@ -6,11 +6,18 @@
   font-family: "zocial", sans-serif;
 }
 
+html {
+  background: url("img/debut_light.png");
+}
+
 body {
   font-family: Raleway;
   font-weight: 400; 
+  background: url("img/debut_light.png");
 
 }
+
+
 
 a {
   color: black;
@@ -41,6 +48,10 @@ article {
   padding-top: 1rem;
 }
 
+
+.blog {
+  background-color: white;
+}
 
 .login {
   max-width: 20rem;

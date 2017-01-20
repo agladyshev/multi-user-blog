@@ -29,6 +29,35 @@
       {{blog.created.strftime("%b %d, %Y")}}
     </div>
   </div>
+  <div class="row">
+    <div class="comments small-10 column small-centered">
+      {% for comment in comments %}
+        
+          {{comment.render() | safe}}
+        
+      {% endfor %}
+      <form method="post" class="small-12 column">
+        <div class="row column">
+          <label>New comment
+            <input class="" type="text" name="comment" required="required">
+            <input type="hidden" name="blog_id" value="{{blog.key().id()}}">
+          </label>
+        </div>
+        <!-- <div class="row column text-left">
+        {% if comment_error %}
+          <span class="form-error is-visible">
+          {{comment_error}}
+          </span>
+          {% endif %}
+        </div> -->
+        <div class="row">
+          <fieldset class="column text-right">
+            <button class="small hollow button" type="submit" value="Submit">Submit</button>
+          </fieldset>
+        </div>
+      </form>
+    </div>
+  </div>
 </article>
 
 
