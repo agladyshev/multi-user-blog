@@ -135,7 +135,7 @@ class Blog(db.Model):
         return l
 
     def render(self, current_user=None):
-        owner = False
+        owner = None
         if current_user:
             owner = self.author.key().id() == current_user.key().id()
         self._render_text = self.content.replace('\n', '<br>')
@@ -258,10 +258,24 @@ class PostPage(MainPage):
         if not blog:
             self.error(404)
             return
-
-
-
         self.render("postpage.html", blog=blog, current_user=self.user)
+
+    def post(self, blog_id):
+        
+        comment = self.request.get("comment")
+        blog_id = self.request.get("blog_id")
+        blog = Blog.by_id(int(blog_id))
+        if comment:
+            c = Comment(content=comment, author=self.user, blog=blog)
+            c.put()
+        else:
+            like = Like.get_user_like(user=self.user, blog=blog)
+            if like:
+                like.delete()
+            else:
+                l = Like(author=self.user, blog=blog)
+                l.put()
+        self.render("postpage.html", blog=blog, current_user=self.user)   
 
 
 class Register(Handler):
@@ -401,6 +415,36 @@ class EditPost(Handler):
                 return
 
 
+# class MyBlog(Handler):
+
+#     def render_my(self):
+
+#         blogs = Blog.all().filter('author =', self.user).order('-created')
+
+#         self.render(
+#             "blog.html", blogs=blogs, current_user=self.user)
+
+#     def get(self):
+
+#         self.render_my()
+
+#     def post(self):
+#         comment = self.request.get("comment")
+#         blog_id = self.request.get("blog_id")
+#         blog = Blog.by_id(int(blog_id))
+#         if comment:
+#             c = Comment(content=comment, author=self.user, blog=blog)
+#             c.put()
+#         else:
+#             like = Like.get_user_like(user=self.user, blog=blog)
+#             if like:
+#                 like.delete()
+#             else:
+#                 l = Like(author=self.user, blog=blog)
+#                 l.put()
+#         self.render_my()
+
+
 
 app = webapp2.WSGIApplication([('/', MainPage),
                                ('/newpost', NewPost),
@@ -410,5 +454,6 @@ app = webapp2.WSGIApplication([('/', MainPage),
                                ('/logout', Logout),
                                ('/welcome', WelcomePage),
                                ('/edit/(\d+)', EditPost),
+                               # ('/myblog', MyBlog),
                                ],
                               debug=True)

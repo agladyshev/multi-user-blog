@@ -1,0 +1,10 @@
+<div class="small-12 column comment_author">
+  <h4>{{comment.author.name}}</h4>
+</div>
+<div class="small-12 column">
+  {{comment._render_text | safe}}
+</div>
+<div class="small-12 column comment_date">
+  <label>{{comment.created.strftime("%b %d, %Y")}}</label>
+</div>
+<hr>

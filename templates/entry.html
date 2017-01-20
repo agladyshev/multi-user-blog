@@ -3,7 +3,7 @@
   <div class="row">
 
     <div class="small-12 column">
-      <h2>{{blog.subject}}</h2>
+      <a href="/{{blog.key().id()}}"><h2>{{blog.subject}}</h2></a>
     </div>
     
     <div class="small-9 column">
@@ -25,6 +25,16 @@
     <hr>
     <div class="row">
       <div class="small-6 column">
+        {% if owner is none %}
+          <a class="link-hover" href="/login">
+            <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" viewBox="0 0 100 100"><path class="icon-hover" fill="#000000" d="M67.607 13.462A22.1 22.1 0 0 0 50 22.136a22.098 22.098 0 0 0-17.61-8.674c-12.266 0-22.283 10.013-22.33 22.32-.046 13.245 6.359 21.054 11.507 27.331l1.104 1.349c6.095 7.515 24.992 21.013 25.792 21.584a2.654 2.654 0 0 0 3.077 0c.8-.571 19.697-14.069 25.792-21.584l1.103-1.349c5.147-6.277 11.553-14.086 11.507-27.331-.048-12.307-10.066-22.32-22.335-22.32z"/></svg>
+            Like
+            {% if likes.count() %}
+              {{likes.count()}}
+            {% endif %}
+          </a>
+        </a>
+        {% else %}
         <form method="post">
           <input type="hidden" name="blog_id" value="{{blog.key().id()}}">
           <button type="submit" class="link-hover">
@@ -36,6 +46,13 @@
             </a>
           </button>
         </form>
+        {% endif %}
+
+
+        
+
+
+
       </div>
       <div class="small-6 column text-right">
         {{blog.created.strftime("%b %d, %Y")}}
@@ -57,6 +74,11 @@
           {{comment.render() | safe}}
         
       {% endfor %}
+      {% if owner is none %}
+      <div class="small-12 column text-center">
+        <a class="label" href="/login">Log in to post comments</a>
+      </div>
+      {% else %}
       <form method="post" class="small-12 column">
         <div class="row column">
           <label>New comment
@@ -77,9 +99,9 @@
           </fieldset>
         </div>
       </form>
+      {% endif %}
     </div>
   </div>
-  
 </article>
 
 
