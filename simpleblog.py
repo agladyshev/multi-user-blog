@@ -113,6 +113,10 @@ class User(db.Model):
             return u
 
 
+# def blog_key(name = 'default'):
+#     return db.Key.from_path('blogs', name)
+
+
 class Blog(db.Model):
     subject = db.StringProperty(required=True)
     content = db.TextProperty(required=True)
@@ -125,13 +129,19 @@ class Blog(db.Model):
         c = Comment.by_blog_id(blog_id)
         return c
 
+    def get_likes(self):
+        blog_id = int(self.key().id())
+        l = Like.by_blog_id(blog_id)
+        return l
+
     def render(self, current_user=None):
         owner = False
         if current_user:
             owner = self.author.key().id() == current_user.key().id()
         self._render_text = self.content.replace('\n', '<br>')
         comments = self.get_comments()
-        return render_str("entry.html", blog=self, owner=owner, comments=comments)
+        likes = self.get_likes()
+        return render_str("entry.html", blog=self, owner=owner, comments=comments, likes=likes)
 
     @classmethod
     def by_id(cls, uid):
@@ -159,11 +169,25 @@ class Comment(db.Model):
         return comments
             
 
-
-
 class Like(db.Model):
     blog = db.ReferenceProperty(Blog, required=True)
     author = db.ReferenceProperty(User, required=True)
+
+    @classmethod
+    def by_id(cls, uid):
+        return cls.get_by_id(uid)
+
+    @classmethod
+    def by_blog_id(cls, blog_id):
+        blog = Blog.by_id(blog_id)
+        likes = cls.all().filter('blog =', blog)
+        return likes
+
+    @classmethod
+    def get_user_like(cls, user, blog):
+        #check if user has liked blog already, return object or null
+        return cls.all().filter('blog =', blog).filter('author =', user).get()
+
 
 
 class MainPage(Handler):
@@ -185,8 +209,16 @@ class MainPage(Handler):
         comment = self.request.get("comment")
         blog_id = self.request.get("blog_id")
         blog = Blog.by_id(int(blog_id))
-        c = Comment(content=comment, author=self.user, blog=blog)
-        c.put()
+        if comment:
+            c = Comment(content=comment, author=self.user, blog=blog)
+            c.put()
+        else:
+            like = Like.get_user_like(user=self.user, blog=blog)
+            if like:
+                like.delete()
+            else:
+                l = Like(author=self.user, blog=blog)
+                l.put()
         self.render_main()
         
 

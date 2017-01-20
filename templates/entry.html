@@ -1,34 +1,66 @@
 <article class="row column">
+
   <div class="row">
-    <div class="small-9 column">
+
+    <div class="small-12 column">
       <h2>{{blog.subject}}</h2>
     </div>
-    <!-- {% if owner %}
-    <div class="small-3 column text-right">
-      <a class="edit__icon" href="/newpost">
-      <svg xmlns="http://www.w3.org/2000/svg" width="2rem" height="2rem" viewBox="0 0 187.5 187.5" version="1"><g stroke="#000"><path d="M125.061 48.743l-74.15 74.151-5.066 18.921 17.987-4.824 74.743-74.734s6.915-6.64 0-13.514c-6.507-6.457-13.189-.308-13.514 0z" stroke-width="3.74922" fill="none"/><path d="M66.299 133.625s-3.908 1.642-5.69-.2c-1.784-1.85-.909-5.59-.909-5.59s-3.166 1.633-4.45-.217c-1.29-1.85-1.815-2.916-1.132-4.79s.166-2.666.166-2.666" stroke-width="1.91460168" fill="none"/><path d="M47.236 139.99l3.916-3.357" stroke-width="5.20725" fill="none"/><path d="M59.958 127.977c3.633-3.625 78.184-77.06 78.184-77.06" stroke-width="2.29119" fill="none"/><path transform="matrix(.59054 .12004 .3354 .68777 258.467 -71.77)" d="M-335.39 238.29a8.476 8.88 0 1 1-16.96 0 8.476 8.88 0 1 1 16.96 0z" stroke-linejoin="round" stroke-linecap="round" stroke-width="2.75"/></g></svg>
-      </a>
-    </div>
-    {% endif %} -->
     
     <div class="small-9 column">
       <h5 class="subheader">by {{blog.author.name}}</h5>
     </div>
-    {% if owner %}
+    
     <div class="small-3 column text-right">
+      {% if owner %}
       <a class="edit__icon" href="/edit/{{blog.key().id()}}">
       <svg xmlns="http://www.w3.org/2000/svg" width="2rem" height="2rem" viewBox="0 0 187.5 187.5" version="1"><g stroke="#000"><path d="M125.061 48.743l-74.15 74.151-5.066 18.921 17.987-4.824 74.743-74.734s6.915-6.64 0-13.514c-6.507-6.457-13.189-.308-13.514 0z" stroke-width="3.74922" fill="none"/><path d="M66.299 133.625s-3.908 1.642-5.69-.2c-1.784-1.85-.909-5.59-.909-5.59s-3.166 1.633-4.45-.217c-1.29-1.85-1.815-2.916-1.132-4.79s.166-2.666.166-2.666" stroke-width="1.91460168" fill="none"/><path d="M47.236 139.99l3.916-3.357" stroke-width="5.20725" fill="none"/><path d="M59.958 127.977c3.633-3.625 78.184-77.06 78.184-77.06" stroke-width="2.29119" fill="none"/><path transform="matrix(.59054 .12004 .3354 .68777 258.467 -71.77)" d="M-335.39 238.29a8.476 8.88 0 1 1-16.96 0 8.476 8.88 0 1 1 16.96 0z" stroke-linejoin="round" stroke-linecap="round" stroke-width="2.75"/></g></svg>
       </a>
+      {% endif %}
     </div>
-    {% endif %}
     
-    <div class="small-12 column text-justify blog__text">
-      {{blog._render_text | safe}}
-    </div>
-    <div class="column small-12 text-right">
-      {{blog.created.strftime("%b %d, %Y")}}
-    </div>
   </div>
+
+
+  <div class="row column text-justify blog__text">
+    {{blog._render_text | safe}}
+  </div>
+
+
+
+
+  <div class="row column like__panel">
+    <hr>
+    <div class="row">
+      <div class="small-6 column">
+        <form method="post">
+          <input type="hidden" name="blog_id" value="{{blog.key().id()}}">
+          <button type="submit" class="link-hover">
+            <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" viewBox="0 0 100 100"><path class="icon-hover" fill="#000000" d="M67.607 13.462A22.1 22.1 0 0 0 50 22.136a22.098 22.098 0 0 0-17.61-8.674c-12.266 0-22.283 10.013-22.33 22.32-.046 13.245 6.359 21.054 11.507 27.331l1.104 1.349c6.095 7.515 24.992 21.013 25.792 21.584a2.654 2.654 0 0 0 3.077 0c.8-.571 19.697-14.069 25.792-21.584l1.103-1.349c5.147-6.277 11.553-14.086 11.507-27.331-.048-12.307-10.066-22.32-22.335-22.32z"/></svg>
+            <a>Like</a>
+          </button>
+          {% if likes.count() %}
+            <p class="label">
+              {{likes.count()}}
+            </p>
+          {% endif %}
+        </form>
+        
+
+        
+
+
+      </div>
+      <div class="small-6 column text-right">
+        {{blog.created.strftime("%b %d, %Y")}}
+      </div>
+    </div>
+    
+  </div>
+
+  
+
+
+
   <div class="row">
     <div class="comments small-10 column small-centered">
       {% for comment in comments %}
@@ -58,6 +90,7 @@
       </form>
     </div>
   </div>
+  
 </article>
 
 
