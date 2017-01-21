@@ -5,11 +5,12 @@ import re
 import random
 import hashlib
 import hmac
-import logging
+import cgi
 from string import letters
 from pybcrypt import bcrypt
 
-from google.appengine.ext import db
+
+from google.appengine.ext import ndb
 
 
 template_dir = os.path.join(os.path.dirname(__file__), 'templates')
@@ -66,7 +67,7 @@ class Handler(webapp2.RequestHandler):
         return cookie_val and check_secure_val(cookie_val)
 
     def login(self, user):
-        self.set_secure_cookie('user_id', str(user.key().id()))
+        self.set_secure_cookie('user_id', str(user.key.id()))
 
     def logout(self):
         self.response.headers.add_header('Set-Cookie', 'user_id=; Path=/')
@@ -74,35 +75,46 @@ class Handler(webapp2.RequestHandler):
     def initialize(self, *a, **kw):
         webapp2.RequestHandler.initialize(self, *a, **kw)
         uid = self.read_secure_cookie('user_id')
+
         self.user = uid and User.by_id(int(uid))
 
     def is_owner(self, blog):
-        #check if logged in user is an author of a blog
-        if self.user and blog.author.key().id() == self.user.key().id():
+        # check if logged in user is an author of a blog
+        if self.user and blog.key.parent() == self.user.key:
             return True
+    
 
 
+def users_key(group='default'):
+    return ndb.Key('users', group)
 
-class User(db.Model):
-    name = db.StringProperty(required=True)
-    pw_hash = db.StringProperty(required=True)
-    email = db.StringProperty()
-    created = db.DateTimeProperty(auto_now_add=True)
+
+def get_user_key(user_id):
+
+    return ndb.Key(User, user_id, parent=users_key())
+
+
+class User(ndb.Model):
+    name = ndb.StringProperty(required=True)
+    pw_hash = ndb.StringProperty(required=True)
+    email = ndb.StringProperty()
+    created = ndb.DateTimeProperty(auto_now_add=True)
 
     @classmethod
     def by_id(cls, uid):
-        return cls.get_by_id(uid)
+        return cls.get_by_id(uid, parent = users_key())
 
     @classmethod
     def by_name(cls, name):
-        u = cls.all().filter('name =', name).get()
+        u = cls.query().filter(User.name == name).get()
         return u
 
     @classmethod
     def register(cls, name, password, email=None):
         pw_hash = make_pw_hash(password)
 
-        return cls(name=name,
+        return cls(parent=users_key(),
+                   name=name,
                    pw_hash=pw_hash,
                    email=email)
 
@@ -114,89 +126,92 @@ class User(db.Model):
 
 
 # def blog_key(name = 'default'):
-#     return db.Key.from_path('blogs', name)
+#     return ndb.Key.from_path('blogs', name)
 
 
-class Blog(db.Model):
-    subject = db.StringProperty(required=True)
-    content = db.TextProperty(required=True)
-    created = db.DateTimeProperty(auto_now_add=True)
-    last_modified = db.DateTimeProperty(auto_now=True)
-    author = db.ReferenceProperty(User, required=True)
+class Blog(ndb.Model):
+    subject = ndb.StringProperty(required=True)
+    content = ndb.TextProperty(required=True)
+    created = ndb.DateTimeProperty(auto_now_add=True)
+    last_modified = ndb.DateTimeProperty(auto_now=True)
+    #author = ndb.ReferenceProperty(User, required=True)
 
     def get_comments(self):
-        blog_id = int(self.key().id())
-        c = Comment.by_blog_id(blog_id)
+        blog_key = self.key
+        c = Comment.by_blog_key(blog_key)
         return c
 
     def get_likes(self):
-        blog_id = int(self.key().id())
-        l = Like.by_blog_id(blog_id)
+        blog_key = self.key
+        l = Like.by_blog_key(blog_key)
         return l
 
     def render(self, current_user=None):
+
         owner = None
         if current_user:
-            owner = self.author.key().id() == current_user.key().id()
+            owner = self.key.parent() == current_user.key
         self._render_text = self.content.replace('\n', '<br>')
         comments = self.get_comments()
         likes = self.get_likes()
+
+
         return render_str("entry.html", blog=self, owner=owner, comments=comments, likes=likes)
 
     @classmethod
-    def by_id(cls, uid):
-        return cls.get_by_id(uid)
+    def by_id(cls, blog_id, user_id):
+        parent = get_user_key(user_id)
+        return cls.get_by_id(blog_id, parent=parent)
 
 
-class Comment(db.Model):
-    author = db.ReferenceProperty(User, required=True)
-    blog = db.ReferenceProperty(Blog, required=True)
-    content = db.StringProperty(required=True)
-    created = db.DateTimeProperty(auto_now_add=True)
+class Comment(ndb.Model):
+    # author = ndb.ReferenceProperty(User, required=True)
+    blog = ndb.KeyProperty(kind=Blog, required=True)
+    content = ndb.StringProperty(required=True)
+    created = ndb.DateTimeProperty(auto_now_add=True)
 
     def render(self, current_user=None):
         # owner = False
         # if current_user:
-        #     owner = self.author.key().id() == current_user.key().id()
+        #     owner = self.author.key.id() == current_user.key.id()
         self._render_text = self.content.replace('\n', '<br>')
         # return render_str("comments.html", comments=self, owner=owner)
         return render_str("comment.html", comment=self)
 
     @classmethod
-    def by_blog_id(cls, blog_id):
-        blog = Blog.by_id(blog_id)
-        comments = cls.all().filter('blog =', blog).order("created")
+    def by_blog_key(cls, blog_key):
+        comments = cls.query().filter(Comment.blog == blog_key).order(Comment.created)
         return comments
-            
 
-class Like(db.Model):
-    blog = db.ReferenceProperty(Blog, required=True)
-    author = db.ReferenceProperty(User, required=True)
+
+class Like(ndb.Model):
+    blog = ndb.KeyProperty(kind=Blog, required=True)
+    # author = ndb.ReferenceProperty(User, required=True)
 
     @classmethod
     def by_id(cls, uid):
         return cls.get_by_id(uid)
 
     @classmethod
-    def by_blog_id(cls, blog_id):
-        blog = Blog.by_id(blog_id)
-        likes = cls.all().filter('blog =', blog)
+    def by_blog_key(cls, blog_key):
+        #needs work
+        likes = cls.query().filter(Like.blog == blog_key)
         return likes
 
     @classmethod
-    def get_user_like(cls, user, blog):
-        #check if user has liked blog already, return object or null
-        return cls.all().filter('blog =', blog).filter('author =', user).get()
-
+    def get_user_like(cls, user_key, blog_key):
+        #rewrite for parent key
+        # check if user has liked blog already, return object or null
+        return cls.query(ancestor=user_key).filter(Like.blog == blog_key).get()
 
 
 class MainPage(Handler):
 
     def render_main(self):
 
-        # blogs = db.GqlQuery(
+        # blogs = ndb.GqlQuery(
         #     "SELECT * FROM Blog ORDER BY created DESC limit 10")
-        blogs = Blog.all().order('-created')
+        blogs = Blog.query().order(-Blog.created)
 
         self.render(
             "blog.html", blogs=blogs, current_user=self.user)
@@ -207,17 +222,18 @@ class MainPage(Handler):
 
     def post(self):
         comment = self.request.get("comment")
-        blog_id = self.request.get("blog_id")
-        blog = Blog.by_id(int(blog_id))
+        blog_key = self.request.get("blog_key")
+        blog_key = ndb.Key(urlsafe=blog_key)
+        user_key = get_user_key(self.user.key.id())
         if comment:
-            c = Comment(content=comment, author=self.user, blog=blog)
+            c = Comment(content=comment, parent=user_key, blog=blog_key)
             c.put()
         else:
-            like = Like.get_user_like(user=self.user, blog=blog)
+            like = Like.get_user_like(user_key=self.user.key, blog_key=blog_key)
             if like:
-                like.delete()
+                like.key.delete()
             else:
-                l = Like(author=self.user, blog=blog)
+                l = Like(parent=user_key, blog=blog_key)
                 l.put()
         self.render_main()
 
@@ -226,7 +242,7 @@ class MainPage(Handler):
 
 #     def render_main(self, num):
 #         self.render_main()
-        
+
 
 class NewPost(Handler):
 
@@ -243,45 +259,70 @@ class NewPost(Handler):
         content = self.request.get("content")
 
         if subject and content:
-            b = Blog(subject=subject, content=content, author=self.user)
+
+            # post_id = self.create_post_id(subject)
+
+            user_key = get_user_key(self.user.key.id())
+
+
+
+
+            b = Blog(subject=subject, content=content, parent=user_key)
             b.put()
-            blog_id = b.key().id()
-            self.redirect("/%d" % blog_id)
+            author = self.user.name
+            blog_id = b.key.id()
+            self.redirect("/%s/%d" % (author, blog_id))
         else:
             error = "We need both a subject and some text!"
             self.render(
                 "newpost.html", subject=subject, content=content, error=error)
 
+    # def create_post_id(self, subject):
+    #     post_id = str(subject)
+    #     post_id = post_id.lowercase().strip()
+    #     post_id = subject.replace("","-")
+    #     return post_id
+
+
+
+
+
 
 class PostPage(MainPage):
 
-    def get(self, blog_id):
+    def get(self, author, blog_id):
         """
         When you use " (\d+) ", app sends this number as a parameter
         (of type string) to the get or post methods
         """
-        blog = Blog.by_id(int(blog_id))
+
+        u = User.by_name(author)
+        user_id = u.key.id()
+        blog = Blog.by_id(int(blog_id), int(user_id))
         if not blog:
             self.error(404)
             return
         self.render("postpage.html", blog=blog, current_user=self.user)
 
-    def post(self, blog_id):
-        
+    def post(self, author, blog_id):
+
         comment = self.request.get("comment")
-        blog_id = self.request.get("blog_id")
-        blog = Blog.by_id(int(blog_id))
+        blog_key = self.request.get("blog_key")
+        blog_key = ndb.Key(urlsafe=blog_key)
+        user_key = get_user_key(self.user.key.id())
+        blog = blog_key.get()
         if comment:
-            c = Comment(content=comment, author=self.user, blog=blog)
+            c = Comment(content=comment, parent=user_key, blog=blog_key)
             c.put()
         else:
-            like = Like.get_user_like(user=self.user, blog=blog)
+            like = Like.get_user_like(user_key=self.user.key, blog_key=blog_key)
             if like:
-                like.delete()
+                like.key.delete()
             else:
-                l = Like(author=self.user, blog=blog)
+                l = Like(parent=user_key, blog=blog_key)
                 l.put()
-        self.render("postpage.html", blog=blog, current_user=self.user)   
+
+        self.render("postpage.html", blog=blog, current_user=self.user)
 
 
 class Register(Handler):
@@ -383,12 +424,14 @@ class WelcomePage(Handler):
 
 class EditPost(Handler):
 
-    def get(self, blog_id):
+    def get(self, author, blog_id):
         """
         When you use " (\d+) ", app sends this number as a parameter
         (of type string) to the get or post methods
         """
-        blog = Blog.by_id(int(blog_id))
+        u = User.by_name(author)
+        user_id = u.key.id()
+        blog = Blog.by_id(int(blog_id), int(user_id))
         if not blog:
             self.error(404)
             return
@@ -399,67 +442,39 @@ class EditPost(Handler):
             self.error(401)
             return
 
-    def post(self, blog_id):
+    def post(self, author, blog_id):
 
         subject = self.request.get("subject")
         content = self.request.get("content")
+        u = User.by_name(author)
+        user_id = u.key.id()
+        blog = Blog.by_id(int(blog_id), int(user_id))
 
         if subject and content:
-            blog = Blog.by_id(int(blog_id))
+            
             blog.subject = subject
             blog.content = content
             blog.put()
-            blog_id = blog.key().id()
-            self.redirect("/%d" % blog_id)
+
+            self.redirect("/%s/%d" % (author, int(blog_id)))
         else:
-            blog = Blog.by_id(int(blog_id))
+            
             if self.is_owner(blog):
-                blog.delete()
+                blog.key.delete()
                 self.redirect("/")
             else:
                 self.error(401)
                 return
 
 
-# class MyBlog(Handler):
-
-#     def render_my(self):
-
-#         blogs = Blog.all().filter('author =', self.user).order('-created')
-
-#         self.render(
-#             "blog.html", blogs=blogs, current_user=self.user)
-
-#     def get(self):
-
-#         self.render_my()
-
-#     def post(self):
-#         comment = self.request.get("comment")
-#         blog_id = self.request.get("blog_id")
-#         blog = Blog.by_id(int(blog_id))
-#         if comment:
-#             c = Comment(content=comment, author=self.user, blog=blog)
-#             c.put()
-#         else:
-#             like = Like.get_user_like(user=self.user, blog=blog)
-#             if like:
-#                 like.delete()
-#             else:
-#                 l = Like(author=self.user, blog=blog)
-#                 l.put()
-#         self.render_my()
-
-
-
 app = webapp2.WSGIApplication([('/', MainPage),
                                ('/newpost', NewPost),
-                               ('/(\d+)', PostPage),
+                               ('/([a-zA-Z0-9_-]{3,20})/(\d+)', PostPage),
                                ('/signup', Register),
                                ('/login', Login),
                                ('/logout', Logout),
                                ('/welcome', WelcomePage),
-                               ('/edit/(\d+)', EditPost),
+                               ('/edit/([a-zA-Z0-9_-]{3,20})/(\d+)', EditPost),
                                # ('/myblog', MyBlog),
                                ],
                               debug=True)
