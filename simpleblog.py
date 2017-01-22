@@ -3,12 +3,15 @@ import webapp2
 import jinja2
 import re
 import random
-import hashlib
+import logging
 import hmac
-import cgi
+import json
 from string import letters
 from pybcrypt import bcrypt
 
+# import ndb_json
+# # JSON serializer/deserializer adapted for use with Google App Engine's NDB Datastore API.
+# # https://gist.github.com/erichiggins/8969259
 
 from google.appengine.ext import ndb
 
@@ -144,7 +147,7 @@ class Blog(ndb.Model):
     def get_likes(self):
         blog_key = self.key
         l = Like.by_blog_key(blog_key)
-        return l
+        return l.count()
 
     def is_owner(self, current_user=None):
         if current_user:
@@ -196,7 +199,7 @@ class Like(ndb.Model):
     # def is_owner(self, current_user=None):
     #     if current_user:
     #         return self.key.parent() == current_user.key
-    
+
     @classmethod
     def by_id(cls, uid):
         return cls.get_by_id(uid)
@@ -476,6 +479,43 @@ class EditPost(Handler):
                 return
 
 
+class LikeHandler(Handler):
+    def post(self):
+        # logging.debug(self.request.body)
+        data = json.loads(self.request.body)
+        blog_key = ndb.Key(urlsafe=data['blog_key'])
+        user_key_ndb = get_user_key(self.user.key.id())
+        like = Like.get_user_like(user_key=self.user.key, blog_key=blog_key)
+        if not like:
+            like = Like(parent = user_key_ndb, blog = blog_key)
+            like.put()
+            likes = blog_key.get().get_likes()
+            self.response.out.write(json.dumps(({'likes': likes+1})))
+        else:
+            like.key.delete()
+            likes = blog_key.get().get_likes()
+            if (likes-1) == 0:
+                likes = ''
+            self.response.out.write(json.dumps(({'likes': likes})))
+        
+        logging.debug(likes)
+        
+
+
+class CommentHandler(Handler):
+    def post(self):
+        data = json.loads(self.request.body)
+        blog_key = ndb.Key(urlsafe=data['blog_key'])
+        comment = data['comment']
+
+
+        user_key_ndb = get_user_key(self.user.key.id())
+
+
+
+        return
+
+
 app = webapp2.WSGIApplication([('/', MainPage),
                                ('/newpost', NewPost),
                                ('/([a-zA-Z0-9_-]{3,20})/(\d+)', PostPage),
@@ -484,6 +524,7 @@ app = webapp2.WSGIApplication([('/', MainPage),
                                ('/logout', Logout),
                                ('/welcome', WelcomePage),
                                ('/edit/([a-zA-Z0-9_-]{3,20})/(\d+)', EditPost),
-                               # ('/myblog', MyBlog),
+                               ('/like', LikeHandler),
+                               ('/comment', CommentHandler),
                                ],
                               debug=True)

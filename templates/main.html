@@ -70,6 +70,19 @@
                $(this).hide();
            }
       );
+      function Like(blog_key){
+          $.ajax({
+            type: "POST",
+            url: "/like",
+            dataType: 'json',
+            data: JSON.stringify({ "blog_key": blog_key})
+          })
+          .done(function( data ) {
+              // var $likes = $('.LikeCount')
+              $('.LikeCount').text(data['likes']);
+
+          });
+      };
     </script>
 
   </body>
