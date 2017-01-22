@@ -78,11 +78,27 @@
             data: JSON.stringify({ "blog_key": blog_key})
           })
           .done(function( data ) {
-              // var $likes = $('.LikeCount')
-              $('.LikeCount').text(data['likes']);
-
+              $('.likes__counter').text(data['likes']);
           });
       };
+      function Comment(content, blog_key){
+          $.ajax({
+            type: "POST",
+            url: "/comment",
+            dataType: 'json',
+            data: JSON.stringify({"content": content, "blog_key": blog_key})
+          })
+          .done(function( data ) {
+              // $('.comment__new').text(data['comment']);
+              $('.comment__content').text(data['comment']['content']);
+              $('.comment__author').text(data['comment']['author']);
+              $('.comment__time').text('just now');
+              
+              console.log(data['comment']['author'])
+              console.log(data['comment']['content'])
+          });
+      };
+      // $('comment_new:empty').hide();
     </script>
 
   </body>

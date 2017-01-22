@@ -21,6 +21,13 @@ jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_dir),
                                autoescape=True)
 
 
+def get_new_comment(comment_key):
+    comment = ndb.Key(urlsafe=comment_key)
+    return comment.get()
+
+jinja_env.globals['get_new_comment'] = get_new_comment
+
+
 secret = 'QM8DcZ8ThA7*se9MIyqFCBbV8A3QTU5!4DgD508Cq268Th42'
 
 
@@ -85,7 +92,6 @@ class Handler(webapp2.RequestHandler):
         # check if logged in user is an author of a blog
         if self.user and blog.key.parent() == self.user.key:
             return True
-    
 
 
 def users_key(group='default'):
@@ -105,7 +111,7 @@ class User(ndb.Model):
 
     @classmethod
     def by_id(cls, uid):
-        return cls.get_by_id(uid, parent = users_key())
+        return cls.get_by_id(uid, parent=users_key())
 
     @classmethod
     def by_name(cls, name):
@@ -153,14 +159,16 @@ class Blog(ndb.Model):
         if current_user:
             return self.key.parent() == current_user.key
 
-
     def render(self, current_user=None):
         self._render_text = self.content.replace('\n', '<br>')
         comments = self.get_comments()
         likes = self.get_likes()
 
-
-        return render_str("entry.html", blog=self, comments=comments, likes=likes, current_user=current_user)
+        return render_str("entry.html",
+                          blog=self,
+                          comments=comments,
+                          likes=likes,
+                          current_user=current_user)
 
     @classmethod
     def by_id(cls, blog_id, user_id):
@@ -179,16 +187,20 @@ class Comment(ndb.Model):
             return self.key.parent() == current_user.key
 
     def render(self, current_user=None):
+        logging.debug("i'm here")
         # owner = False
         # if current_user:
         #     owner = self.author.key.id() == current_user.key.id()
         self._render_text = self.content.replace('\n', '<br>')
         # return render_str("comments.html", comments=self, owner=owner)
-        return render_str("comment.html", comment=self, current_user=current_user)
+        return render_str("comment.html",
+                          comment=self,
+                          current_user=current_user)
 
     @classmethod
     def by_blog_key(cls, blog_key):
-        comments = cls.query().filter(Comment.blog == blog_key).order(Comment.created)
+        comments = cls.query().filter(
+            Comment.blog == blog_key).order(Comment.created)
         return comments
 
 
@@ -206,13 +218,13 @@ class Like(ndb.Model):
 
     @classmethod
     def by_blog_key(cls, blog_key):
-        #needs work
+        # needs work
         likes = cls.query().filter(Like.blog == blog_key)
         return likes
 
     @classmethod
     def get_user_like(cls, user_key, blog_key):
-        #rewrite for parent key
+        # rewrite for parent key
         # check if user has liked blog already, return object or null
         return cls.query(ancestor=user_key).filter(Like.blog == blog_key).get()
 
@@ -241,7 +253,8 @@ class MainPage(Handler):
             c = Comment(content=comment, parent=user_key, blog=blog_key)
             c.put()
         else:
-            like = Like.get_user_like(user_key=self.user.key, blog_key=blog_key)
+            like = Like.get_user_like(
+                user_key=self.user.key, blog_key=blog_key)
             if like:
                 like.key.delete()
             else:
@@ -276,9 +289,6 @@ class NewPost(Handler):
 
             user_key = get_user_key(self.user.key.id())
 
-
-
-
             b = Blog(subject=subject, content=content, parent=user_key)
             b.put()
             author = self.user.name
@@ -294,10 +304,6 @@ class NewPost(Handler):
     #     post_id = post_id.lowercase().strip()
     #     post_id = subject.replace("","-")
     #     return post_id
-
-
-
-
 
 
 class PostPage(MainPage):
@@ -327,7 +333,8 @@ class PostPage(MainPage):
             c = Comment(content=comment, parent=user_key, blog=blog_key)
             c.put()
         else:
-            like = Like.get_user_like(user_key=self.user.key, blog_key=blog_key)
+            like = Like.get_user_like(
+                user_key=self.user.key, blog_key=blog_key)
             if like:
                 like.key.delete()
             else:
@@ -463,14 +470,14 @@ class EditPost(Handler):
         blog = Blog.by_id(int(blog_id), int(user_id))
 
         if subject and content:
-            
+
             blog.subject = subject
             blog.content = content
             blog.put()
 
             self.redirect("/%s/%d" % (author, int(blog_id)))
         else:
-            
+
             if self.is_owner(blog):
                 blog.key.delete()
                 self.redirect("/")
@@ -480,6 +487,7 @@ class EditPost(Handler):
 
 
 class LikeHandler(Handler):
+
     def post(self):
         # logging.debug(self.request.body)
         data = json.loads(self.request.body)
@@ -487,7 +495,7 @@ class LikeHandler(Handler):
         user_key_ndb = get_user_key(self.user.key.id())
         like = Like.get_user_like(user_key=self.user.key, blog_key=blog_key)
         if not like:
-            like = Like(parent = user_key_ndb, blog = blog_key)
+            like = Like(parent=user_key_ndb, blog=blog_key)
             like.put()
             likes = blog_key.get().get_likes()
             self.response.out.write(json.dumps(({'likes': likes+1})))
@@ -497,23 +505,27 @@ class LikeHandler(Handler):
             if (likes-1) == 0:
                 likes = ''
             self.response.out.write(json.dumps(({'likes': likes})))
-        
+
         logging.debug(likes)
-        
 
 
 class CommentHandler(Handler):
+
     def post(self):
+        # think about escaping input
+
         data = json.loads(self.request.body)
+        # logging.debug(data['blog_key'])
+        # logging.debug(data['content'])
         blog_key = ndb.Key(urlsafe=data['blog_key'])
-        comment = data['comment']
 
-
+        content = data['content']
         user_key_ndb = get_user_key(self.user.key.id())
-
-
-
-        return
+        if content:
+            c = Comment(parent=user_key_ndb, blog=blog_key, content=content)
+            c.put()
+            newcomment = {'author': self.user.name, 'content': content}
+            self.response.out.write(json.dumps(({'comment': newcomment})))
 
 
 app = webapp2.WSGIApplication([('/', MainPage),

@@ -43,7 +43,7 @@
               <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" viewBox="0 0 100 100"><path class="icon-hover" fill="#000000" d="M67.607 13.462A22.1 22.1 0 0 0 50 22.136a22.098 22.098 0 0 0-17.61-8.674c-12.266 0-22.283 10.013-22.33 22.32-.046 13.245 6.359 21.054 11.507 27.331l1.104 1.349c6.095 7.515 24.992 21.013 25.792 21.584a2.654 2.654 0 0 0 3.077 0c.8-.571 19.697-14.069 25.792-21.584l1.103-1.349c5.147-6.277 11.553-14.086 11.507-27.331-.048-12.307-10.066-22.32-22.335-22.32z"/></svg>
             </span>
             Like
-            <span class="LikeCount">
+            <span class="likes__counter">
               {% if likes %}
                 {{likes}}
               {% endif %}
@@ -71,36 +71,24 @@
         </div>
       {% endif %}
       </div>
-
-    
-
-
-
-      
       <div class="small-6 column text-right">
         {{blog.created.strftime("%b %d, %Y")}}
       </div>
     </div>
     <hr>
   </div>
-
-  
-
-
-
   <div class="row">
-
     <div class="comments small-10 column small-centered">
-
       {% for comment in comments %}
           {% if loop.index == 4 %}
           <div class="hide" id="hiddenComments" data-toggler=".hide">
           {% endif %}
-        
             {{comment.render() | safe}}
-
           {% if loop.last and loop.index > 3 %}
           </div class="hide">
+
+
+
           <div class="row">
             <div class="small-6 medium-3 column small-centered text-center">
               <button name="showMore" class="button hollow tiny" data-toggle="hiddenComments">Show more
@@ -108,36 +96,56 @@
             </div>
           </div>
 
+
           {% endif %}
-
-
-        
       {% endfor %}
+
+      
+     
+      <div class="row comment__new">
+        <div class="small-12 column">
+          <h4><span class="comment__author"></span></h4>
+        </div>
+        <div class="small-12 column">
+          <span class="comment__content"></span>
+        </div>
+        <div class="small-12 column">
+          <label class="comment__time"></label>
+        </div>
+      </div>
+      
+      
+
+
+
       {% if current_user is none %}
       <div class="small-12 column text-center small-centered end">
         <a class="label" href="/login">Log in to post comments</a>
       </div>
       {% else %}
-      <form method="post" class="small-12 column">
-        <div class="row column">
-          <label>New comment
-            <textarea maxlength="500" type="text" name="comment" required="required"></textarea>
-            <input type="hidden" name="blog_key" value="{{blog.key.urlsafe()}}">
-          </label>
-        </div>
-        <!-- <div class="row column text-left">
-        {% if comment_error %}
-          <span class="form-error is-visible">
-          {{comment_error}}
-          </span>
-          {% endif %}
-        </div> -->
-        <div class="row">
-          <fieldset class="column text-right">
-            <button class="small hollow button" type="submit" value="Submit">Submit</button>
-          </fieldset>
-        </div>
-      </form>
+
+
+      <div class="small-12 column">
+        <form>
+          <div class="row column">
+            <label>New comment
+              <textarea maxlength="500" name="content" id="newComment" required="required"></textarea>
+            </label>
+          </div>
+          <!-- <div class="row column text-left">
+          {% if comment_error %}
+            <span class="form-error is-visible">
+            {{comment_error}}
+            </span>
+            {% endif %}
+          </div> -->
+          <div class="row">
+            <div class="column text-right">
+              <button type="reset" onclick="javascript:Comment(this.form.content.value,'{{blog.key.urlsafe()}}');" class="small hollow button" value="Submit">Submit</button>
+            </div>
+          </div>
+        </form>
+      </div>
       {% endif %}
     </div>
   </div>

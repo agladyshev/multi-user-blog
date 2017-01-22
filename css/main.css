@@ -65,6 +65,18 @@ article {
   max-width: 12rem;
 }
 
+.comment__new {
+  padding: 0 1rem 1rem 1rem;
+}
+
+/*.comment__new:empty {
+  display:none;
+}
+
+.comment__new:blank {
+  display:none;
+}
+*/
 .uppercase {
   text-transform: uppercase;
 }
