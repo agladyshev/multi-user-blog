@@ -9,10 +9,6 @@ import json
 from string import letters
 from pybcrypt import bcrypt
 
-# import ndb_json
-# # JSON serializer/deserializer adapted for use with Google App Engine's NDB Datastore API.
-# # https://gist.github.com/erichiggins/8969259
-
 from google.appengine.ext import ndb
 
 
@@ -183,16 +179,13 @@ class Comment(ndb.Model):
     created = ndb.DateTimeProperty(auto_now_add=True)
 
     def is_owner(self, current_user=None):
+        logging.debug(current_user)
         if current_user:
             return self.key.parent() == current_user.key
 
     def render(self, current_user=None):
-        logging.debug("i'm here")
-        # owner = False
-        # if current_user:
-        #     owner = self.author.key.id() == current_user.key.id()
+        logging.debug(current_user)
         self._render_text = self.content.replace('\n', '<br>')
-        # return render_str("comments.html", comments=self, owner=owner)
         return render_str("comment.html",
                           comment=self,
                           current_user=current_user)
@@ -525,7 +518,7 @@ class CommentHandler(Handler):
             c = Comment(parent=user_key_ndb, blog=blog_key, content=content)
             comment = c.put()
 
-            comment_html = comment.get().render()
+            comment_html = comment.get().render(self.user)
             logging.debug(comment_html)
 
             # newcomment = {'author': self.user.name, 'content': content}

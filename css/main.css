@@ -81,7 +81,9 @@ article {
   text-transform: uppercase;
 }
 
-.edit__icon {
+.edit__icon, .remove__icon {
+  padding: 0.5rem;
+  margin: 0.1rem;
   
 }
 
