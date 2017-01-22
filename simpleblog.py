@@ -146,17 +146,18 @@ class Blog(ndb.Model):
         l = Like.by_blog_key(blog_key)
         return l
 
-    def render(self, current_user=None):
-
-        owner = None
+    def is_owner(self, current_user=None):
         if current_user:
-            owner = self.key.parent() == current_user.key
+            return self.key.parent() == current_user.key
+
+
+    def render(self, current_user=None):
         self._render_text = self.content.replace('\n', '<br>')
         comments = self.get_comments()
         likes = self.get_likes()
 
 
-        return render_str("entry.html", blog=self, owner=owner, comments=comments, likes=likes)
+        return render_str("entry.html", blog=self, comments=comments, likes=likes, current_user=current_user)
 
     @classmethod
     def by_id(cls, blog_id, user_id):
@@ -170,13 +171,17 @@ class Comment(ndb.Model):
     content = ndb.StringProperty(required=True)
     created = ndb.DateTimeProperty(auto_now_add=True)
 
+    def is_owner(self, current_user=None):
+        if current_user:
+            return self.key.parent() == current_user.key
+
     def render(self, current_user=None):
         # owner = False
         # if current_user:
         #     owner = self.author.key.id() == current_user.key.id()
         self._render_text = self.content.replace('\n', '<br>')
         # return render_str("comments.html", comments=self, owner=owner)
-        return render_str("comment.html", comment=self)
+        return render_str("comment.html", comment=self, current_user=current_user)
 
     @classmethod
     def by_blog_key(cls, blog_key):
@@ -188,6 +193,10 @@ class Like(ndb.Model):
     blog = ndb.KeyProperty(kind=Blog, required=True)
     # author = ndb.ReferenceProperty(User, required=True)
 
+    # def is_owner(self, current_user=None):
+    #     if current_user:
+    #         return self.key.parent() == current_user.key
+    
     @classmethod
     def by_id(cls, uid):
         return cls.get_by_id(uid)
