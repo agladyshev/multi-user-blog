@@ -244,23 +244,23 @@ class MainPage(Handler):
 
         self.render_main()
 
-    def post(self):
-        comment = self.request.get("comment")
-        blog_key = self.request.get("blog_key")
-        blog_key = ndb.Key(urlsafe=blog_key)
-        user_key = get_user_key(self.user.key.id())
-        if comment:
-            c = Comment(content=comment, parent=user_key, blog=blog_key)
-            c.put()
-        else:
-            like = Like.get_user_like(
-                user_key=self.user.key, blog_key=blog_key)
-            if like:
-                like.key.delete()
-            else:
-                l = Like(parent=user_key, blog=blog_key)
-                l.put()
-        self.render_main()
+    # def post(self):
+    #     comment = self.request.get("comment")
+    #     blog_key = self.request.get("blog_key")
+    #     blog_key = ndb.Key(urlsafe=blog_key)
+    #     user_key = get_user_key(self.user.key.id())
+    #     if comment:
+    #         c = Comment(content=comment, parent=user_key, blog=blog_key)
+    #         c.put()
+    #     else:
+    #         like = Like.get_user_like(
+    #             user_key=self.user.key, blog_key=blog_key)
+    #         if like:
+    #             like.key.delete()
+    #         else:
+    #             l = Like(parent=user_key, blog=blog_key)
+    #             l.put()
+    #     self.render_main()
 
 
 # class PageNum(MainPage):
@@ -322,26 +322,26 @@ class PostPage(MainPage):
             return
         self.render("postpage.html", blog=blog, current_user=self.user)
 
-    def post(self, author, blog_id):
+    # def post(self, author, blog_id):
 
-        comment = self.request.get("comment")
-        blog_key = self.request.get("blog_key")
-        blog_key = ndb.Key(urlsafe=blog_key)
-        user_key = get_user_key(self.user.key.id())
-        blog = blog_key.get()
-        if comment:
-            c = Comment(content=comment, parent=user_key, blog=blog_key)
-            c.put()
-        else:
-            like = Like.get_user_like(
-                user_key=self.user.key, blog_key=blog_key)
-            if like:
-                like.key.delete()
-            else:
-                l = Like(parent=user_key, blog=blog_key)
-                l.put()
+    #     comment = self.request.get("comment")
+    #     blog_key = self.request.get("blog_key")
+    #     blog_key = ndb.Key(urlsafe=blog_key)
+    #     user_key = get_user_key(self.user.key.id())
+    #     blog = blog_key.get()
+    #     if comment:
+    #         c = Comment(content=comment, parent=user_key, blog=blog_key)
+    #         c.put()
+    #     else:
+    #         like = Like.get_user_like(
+    #             user_key=self.user.key, blog_key=blog_key)
+    #         if like:
+    #             like.key.delete()
+    #         else:
+    #             l = Like(parent=user_key, blog=blog_key)
+    #             l.put()
 
-        self.render("postpage.html", blog=blog, current_user=self.user)
+    #     self.render("postpage.html", blog=blog, current_user=self.user)
 
 
 class Register(Handler):
@@ -523,9 +523,13 @@ class CommentHandler(Handler):
         user_key_ndb = get_user_key(self.user.key.id())
         if content:
             c = Comment(parent=user_key_ndb, blog=blog_key, content=content)
-            c.put()
-            newcomment = {'author': self.user.name, 'content': content}
-            self.response.out.write(json.dumps(({'comment': newcomment})))
+            comment = c.put()
+
+            comment_html = comment.get().render()
+            logging.debug(comment_html)
+
+            # newcomment = {'author': self.user.name, 'content': content}
+            self.response.out.write(json.dumps(({'comment': comment_html})))
 
 
 app = webapp2.WSGIApplication([('/', MainPage),

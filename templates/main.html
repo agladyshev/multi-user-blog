@@ -90,12 +90,11 @@
           })
           .done(function( data ) {
               // $('.comment__new').text(data['comment']);
-              $('.comment__content').text(data['comment']['content']);
-              $('.comment__author').text(data['comment']['author']);
-              $('.comment__time').text('just now');
-              
-              console.log(data['comment']['author'])
-              console.log(data['comment']['content'])
+              // $('.comment__content').text(data['comment']['content']);
+              // $('.comment__author').text(data['comment']['author']);
+              // $('.comment__time').text('just now');
+
+              $('.comment__new').append(data['comment']);
           });
       };
       // $('comment_new:empty').hide();
