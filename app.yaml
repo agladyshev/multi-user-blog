@@ -7,6 +7,8 @@ handlers:
   static_dir: js
 - url: /css
   static_dir: css
+- url: /foundation-icons
+  static_dir: foundation-icons
 - url: /.*
   script: simpleblog.app
 

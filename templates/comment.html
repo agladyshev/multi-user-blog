@@ -4,11 +4,9 @@
   </div>
   <div class="small-4 column text-right">
     {% if comment.is_owner(current_user) %}
-      <button class="edit__icon" name="editComment">
-      <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" viewBox="0 0 100 100"><path d="M88.79 29.297L70.702 11.209a2.692 2.692 0 0 0-3.808 0L17.389 60.713l.109.109-.171-.046-6.772 25.272.004.001a2.681 2.681 0 0 0 .642 2.748 2.684 2.684 0 0 0 3.033.531l.002.009 25.027-6.706-.016-.059.038.038L88.79 33.105a2.692 2.692 0 0 0 0-3.808zm-69.998 51.85l4.022-15.009 10.988 10.988-15.01 4.021z"/></svg>
+      <button class="fi-clipboard-pencil edit__icon" name="editComment">
       </button>
-      <a class="remove__icon" href="javascript:DeleteComment('{{comment.key.urlsafe()}}');">
-      <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" viewBox="0 0 100 100"><path d="M84.707 68.752L65.951 49.998l18.75-18.752a1.989 1.989 0 0 0 0-2.813L71.566 15.295a1.99 1.99 0 0 0-2.814 0L49.999 34.047l-18.75-18.752c-.746-.747-2.067-.747-2.814 0L15.297 28.431a1.992 1.992 0 0 0 0 2.814L34.05 49.998 15.294 68.753a1.993 1.993 0 0 0 0 2.814L28.43 84.704a1.988 1.988 0 0 0 2.814 0l18.755-18.755 18.756 18.754c.389.388.896.583 1.407.583s1.019-.195 1.408-.583l13.138-13.137a1.99 1.99 0 0 0-.001-2.814z"/></svg>
+      <a class="fi-x remove__icon" href="javascript:DeleteComment('{{comment.key.urlsafe()}}');">
       </a>
     {% endif %}
   </div>
@@ -38,4 +36,3 @@
   </div>
   <hr>
 </div>
-

@@ -3,68 +3,67 @@
 {% block content %}
 
 <nav id="menuBar" class="row expanded hide-for-small-only" data-toggler="hide-for-small-only">
-  <!--row is expanded to full vw to place gradient-->
+  <!--row is expanded to full vw to place gradient if needed-->
   <div class="row">
-    <!--div takes 100% width, so we use row class with max-width 1200px to center content-->
+    <!--div takes 100% width, so we use row class with fixed max-width to center content-->
     <ul class="menu small-12 column simple text-right">
       <li><a href="/">Main page</a></li>
       <li><a href="/login">Login</a></li>
     </ul>
   </div>
 </nav>
-
 <div class="row">
   <form method="post" class="signup small-centered column">
     <div class="row">
       <div class="small-12 columns">
         <label>Username
-          <input class="signup__input" type="text" name="name" value="{{name}}"placeholder="" aria-describedby="exampleHelpText">
+          <input class="signup__input" type="text" name="name" value="{{name}}">
           {% if username_error %}
           <span class="form-error is-visible">
           {{username_error}}
           </span>
           {% endif %}
         </label>
-        <p class="help-text" id="exampleHelpText">At least 3 characters long!</p>
+        <p class="help-text">At least 3 characters long!</p>
       </div>
     </div>
     <div class="row">
       <div class="small-12 columns">
         <label>Password
-          <input class="signup__input" type="password" name="password" value=""placeholder="" aria-describedby="exampleHelpText">
+          <input class="signup__input" type="password" name="password">
           {% if password_error %}
           <span class="form-error is-visible">
           {{password_error}}
           </span>
           {% endif %}
         </label>
-        <p class="help-text" id="exampleHelpText"></p>
+        <p class="help-text"></p>
       </div>
     </div>
     <div class="row">
       <div class="small-12 columns">
         <label>Verify password
-          <input class="signup__input" type="password" name="verify" value="" placeholder="" aria-describedby="exampleHelpText">
+          <input class="signup__input" type="password" name="verify" value="">
           {% if verify_error %}
           <span class="form-error is-visible">
           {{verify_error}}
           </span>
           {% endif %}
         </label>
-        <p class="help-text" id="exampleHelpText"></p>
+        <p class="help-text"></p>
       </div>
     </div>
     <div class="row">
       <div class="small-12 columns">
         <label>Email (optional)
-          <input class="signup__input" type="text" name="email" value="{{email}}" placeholder="" aria-describedby="exampleHelpText">
+          <input class="signup__input" type="text" name="email" value="{{email}}">
           {% if email_error %}
           <span class="form-error is-visible">
           {{email_error}}
           </span>
           {% endif %}
         </label>
-        <p class="help-text" id="exampleHelpText">We won't spam you</p>
+        <p class="help-text">We won't spam you</p>
       </div>
     </div>
     <div class="row">
@@ -75,11 +74,11 @@
     <div class="row">
       <div class="column text-center">
         <hr>
-        <a class="" href="/login" value="Hey! I'm new here">Hey! I've been here before
+        <a href="/login">
+          <h6>Hey! I've been here before</h6>
         </a>
       </div>
     </div>
   </form>
 </div>
 {% endblock %}
-

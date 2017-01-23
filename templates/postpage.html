@@ -3,24 +3,24 @@
 {% block content %}
 
 <nav id="menuBar" class="row expanded hide-for-small-only" data-toggler="hide-for-small-only">
-  <!--row is expanded to full vw to place gradient-->
+  <!--row is expanded to full vw to place gradient if needed-->
   <div class="row">
-    <!--div takes 100% width, so we use row class with max-width 1200px to center content-->
+    <!--div takes 100% width, so we use row class with max-width to center content-->
     {% if not current_user %}
-      <ul class="menu small-12 column simple text-right">
-        <li><a href="/login">Login</a></li>
-        <li><a href="/signup">Signup</a></li>
-      </ul>
+    <ul class="menu small-12 column simple text-right">
+      <li><a href="/login">Login</a></li>
+      <li><a href="/signup">Signup</a></li>
+    </ul>
     {% else %}
-      <ul class="menu small-12 column simple text-left">
-        <li><a href="/newpost">Create</a></li>
-        <li><a href="/logout">Logout</a></li>
-      </ul>
+    <ul class="menu small-12 column simple text-left">
+      <li><a href="/newpost">Create</a></li>
+      <li><a href="/logout">Logout</a></li>
+    </ul>
     {% endif %}
   </div>
 </nav>
 
-<div class="row column post--single">
+<div class="row">
 {% if current_user %}
   {{blog.render(current_user) | safe}}
 {% else %}

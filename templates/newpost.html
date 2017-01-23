@@ -2,9 +2,8 @@
 
 {% block content %}
 
-
 <div class="row">
-  <form class="newpost column" method="post">
+  <form class="column" method="post">
     <div class="row column">
       <h3>New post</h3>
     </div>
@@ -15,7 +14,7 @@
     </div>
     <div class="row column">
       <label>Blog
-        <textarea type="text" name="content">{{content}}
+        <textarea name="content">{{content}}
         </textarea>
       </label>
     </div>
@@ -33,11 +32,10 @@
     </div>
     <hr>
     <div class="row column text-right">
-      <a class="label warning edit__discard" value="Discard changes" href="/">Discard changes
+      <a class="label warning edit__discard" href="/">Discard changes
       </a>
     </div> 
   </form>
 </div>
-
 
 {% endblock %}

@@ -1,18 +1,6 @@
-@import url(http://weloveiconfonts.com/api/?family=zocial);
-
-/*implementing zocial font for social media icons*/
-
-[class*="zocial-"]:before {
-  font-family: "zocial", sans-serif;
-}
-
-html {
-  /*background: url("img/debut_light.png");*/
-}
 
 body, h1, h2, h3, h4, h5, h6 {
   font-family: 'Merriweather', serif;
-  
 }
 
 body {
@@ -22,7 +10,6 @@ body {
 main {
   background-color: #ededed;
 }
-
 
 a {
   color: black;
@@ -36,7 +23,6 @@ header {
   padding-top: 2rem;
   background-color: white;
   background-image: linear-gradient(white, #ededed);
-
 }
 
 nav {
@@ -46,7 +32,6 @@ nav {
 
 footer {
   padding-bottom: 2rem;
-  /*background-image: linear-gradient( white, #ccf2ff);*/
 }
 
 article {
@@ -68,13 +53,13 @@ article:last-of-type {
 }
 
 
-.blog__header {
+.post__header {
   padding-top: 1rem;
   background-image: linear-gradient(#ededed, white);
 
 }
 
-.blog__comments {
+.post__comments {
   padding-bottom: 1rem;
   background-image: linear-gradient(white, #ededed);
 
@@ -103,10 +88,6 @@ article:last-of-type {
 .login__input, .signup__input {
   max-width: 12rem;
 }
-/*
-.comment__edit {
-  padding-right: 2rem;
-}*/
 
 .comment__discard, .comment__commit, .comment__editarea {
   display: none;
@@ -164,163 +145,3 @@ article:last-of-type {
       font-size: 16px;
     }
   }
-
-
-
-
-
-
-
-
-
-/*body {
-	margin-left: auto;
-	margin-right: auto;
-	font-size: 18px;
-  font-family: 'Lora', serif;
-
-}
-
-article {
-	width: 100%;
-}
-
-section {
-  -webkit-box-shadow: 5px 0px 22px -8px rgba(120,112,120,1);
-  -moz-box-shadow: 5px 0px 22px -8px rgba(120,112,120,1);
-  box-shadow: 5px 0px 22px -8px rgba(120,112,120,1);
-}
-
-footer {
-  width: 100%;
-}
-
-h1 {
-	width: 100%;
-
-}
-
-img {
-	max-width: 100%;
-}
-
-figcaption {
-	text-align: center;
-}
-
-textarea {
-  width: 30rem;
-  height: 10rem;
-
-}
-
-@media screen and (min-width: 850px) {
-  header, article,.social {
-    width: 851px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-}
-
-@media screen and (max-width: 450px) {
-  .social {
-    flex-wrap: wrap;
-    height: 100px;
-    text-align: center;
-  }
-  .icon {
-    width: 49%;.
-
-  }
-
-}
-
-
-hr { 
-  height: 30px; 
-  border-style: solid; 
-  border-color: #8c8b8b; 
-  border-width: 1px 0 0 0; 
-  border-radius: 20px; 
-} 
-
-hr:before { 
-  display: block; 
-  content: ""; 
-  height: 30px; 
-  margin-top: -31px; 
-  border-style: solid; 
-  border-color: #8c8b8b; 
-  border-width: 0 0 1px 0; 
-  border-radius: 20px; 
-}
-
-a {
-  color: black;
-  text-decoration: none;
-}
-
-.form {
-  width: 90vw;
-  -webkit-box-shadow: 5px 0px 22px -8px rgba(120,112,120,1);
-  -moz-box-shadow: 5px 0px 22px -8px rgba(120,112,120,1);
-  box-shadow: 5px 0px 22px -8px rgba(120,112,120,1);
-  padding: 20px;
-}
-
-.blog {
-  display: flex;
-  flex-wrap: wrap;
-  padding: 1rem 0.5rem;
-}
-
-.blog-heading {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  padding: 0.5rem 0;
-  margin-bottom: 0.5rem;
-  border-bottom: 0.1rem solid #666;
-}
-
-.blog-title {
-  width: 80%;
-  font-size: 1.5rem;
-}
-
-.blog-date {
-  text-align: right;
-  width: 20%;
-  color: #777;
-}
-
-.blog-content {
-  text-align: justify;
-}
-
-.social {
-  display: flex;
-  justify-content: space-around;
-  padding-bottom: 2em;
-}
-
-.github {
-  width: 100%;
-  text-align: center;
-  margin-bottom: 2em;
-}
-
-.icon {
-  width: 25;
-}
-
-.error {
-  text-align: center;
-  color: red;
-}
-
-.submit {
-  margin: 1rem;
-  text-align: right;
-}*/
-

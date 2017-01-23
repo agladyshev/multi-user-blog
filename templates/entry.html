@@ -1,5 +1,5 @@
 <article class="small-12 column">
-  <div class="row blog__header">
+  <div class="row post__header">
     <div class="small-12 column">
       <a href="/{{blog.key.parent().get().name}}/{{blog.key.id()}}"><h2>{{blog.subject}}</h2></a>
     </div>
@@ -8,8 +8,7 @@
     </div>
     <div class="small-3 column text-right">
       {% if blog.is_owner(current_user) %}
-      <a class="edit__icon" href="/edit/{{blog.key.parent().get().name}}/{{blog.key.id()}}">
-      <svg xmlns="http://www.w3.org/2000/svg" width="1.5rem" height="1.5rem" viewBox="0 0 100 100"><path d="M88.79 29.297L70.702 11.209a2.692 2.692 0 0 0-3.808 0L17.389 60.713l.109.109-.171-.046-6.772 25.272.004.001a2.681 2.681 0 0 0 .642 2.748 2.684 2.684 0 0 0 3.033.531l.002.009 25.027-6.706-.016-.059.038.038L88.79 33.105a2.692 2.692 0 0 0 0-3.808zm-69.998 51.85l4.022-15.009 10.988 10.988-15.01 4.021z"/></svg>
+      <a class="edit__icon fi-pencil" href="/edit/{{blog.key.parent().get().name}}/{{blog.key.id()}}">
       </a>
       {% endif %}
     </div>
@@ -17,15 +16,14 @@
   <div class="row column text-justify blog__text">
     {{blog._render_text | safe}}
   </div>
-  <div class="row column like__panel">
+  <div class="row column">
     <hr>
     <div class="row">
       <div class="small-6 column">
       {% if not blog.is_owner(current_user) %}
       {% if current_user is none %}
         <div class="row column">
-          <a class="link-hover" href="/login">
-            <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" viewBox="0 0 100 100"><path class="icon-hover" fill="#000000" d="M67.607 13.462A22.1 22.1 0 0 0 50 22.136a22.098 22.098 0 0 0-17.61-8.674c-12.266 0-22.283 10.013-22.33 22.32-.046 13.245 6.359 21.054 11.507 27.331l1.104 1.349c6.095 7.515 24.992 21.013 25.792 21.584a2.654 2.654 0 0 0 3.077 0c.8-.571 19.697-14.069 25.792-21.584l1.103-1.349c5.147-6.277 11.553-14.086 11.507-27.331-.048-12.307-10.066-22.32-22.335-22.32z"/></svg>
+          <a class="fi-heart" href="/login">
             Like
             {% if likes %}
               {{likes}}
@@ -34,12 +32,9 @@
         </div>
       {% else %}
         <div class="row column">
-          <a href="javascript:Like('{{blog.key.urlsafe()}}');">
-            <span class="link-hover">
-              <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" viewBox="0 0 100 100"><path class="icon-hover" fill="#000000" d="M67.607 13.462A22.1 22.1 0 0 0 50 22.136a22.098 22.098 0 0 0-17.61-8.674c-12.266 0-22.283 10.013-22.33 22.32-.046 13.245 6.359 21.054 11.507 27.331l1.104 1.349c6.095 7.515 24.992 21.013 25.792 21.584a2.654 2.654 0 0 0 3.077 0c.8-.571 19.697-14.069 25.792-21.584l1.103-1.349c5.147-6.277 11.553-14.086 11.507-27.331-.048-12.307-10.066-22.32-22.335-22.32z"/></svg>
-            </span>
+          <a class="fi-heart" href="javascript:Like('{{blog.key.urlsafe()}}');">
             Like
-            <span class="likes__counter">
+            <span>
               {% if likes %}
                 {{likes}}
               {% endif %}
@@ -49,14 +44,12 @@
       {% endif %}
       {% else %}
         <div class="row">
-          <div class="link-hover small-12 column" href="/login">
-            <button data-toggle-focus="likeError{{blog.key.id()}}" class="link-hover">
-              <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" viewBox="0 0 100 100"><path class="icon-hover" fill="#000000" d="M67.607 13.462A22.1 22.1 0 0 0 50 22.136a22.098 22.098 0 0 0-17.61-8.674c-12.266 0-22.283 10.013-22.33 22.32-.046 13.245 6.359 21.054 11.507 27.331l1.104 1.349c6.095 7.515 24.992 21.013 25.792 21.584a2.654 2.654 0 0 0 3.077 0c.8-.571 19.697-14.069 25.792-21.584l1.103-1.349c5.147-6.277 11.553-14.086 11.507-27.331-.048-12.307-10.066-22.32-22.335-22.32z"/></svg>
-              <a>Like
+          <div class="small-12 column" href="/login">
+            <button data-toggle-focus="likeError{{blog.key.id()}}" class="fi-heart">
+              Like
               {% if likes %}
                 {{likes}}
               {% endif %}
-              </a>
             </button>
           </div>
           <div class="small-12 column">
@@ -73,7 +66,7 @@
     </div>
     <hr>
   </div>
-  <div class="row blog__comments">
+  <div class="row post__comments">
     <div class="small-10 column small-centered">
       {% for comment in comments %}
           {% if loop.index == 4 %}
@@ -117,6 +110,3 @@
     </div>
   </div>
 </article>
-
-
-
