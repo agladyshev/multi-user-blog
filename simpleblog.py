@@ -17,7 +17,7 @@ jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_dir),
 
 secret = 'QM8DcZ8ThA7*se9MIyqFCBbV8A3QTU5!4DgD508Cq268Th42'
 
-    
+
 def render_str(template, **params):
     t = jinja_env.get_template(template)
     return t.render(params)
@@ -412,7 +412,8 @@ class LikeHandler(Handler):
             like = Like(parent=user_key_ndb, blog=blog_key)
             like.put()
             likes = blog_key.get().get_likes()
-            self.response.out.write(json.dumps(({'likes': likes+1})))
+            self.response.out.write(
+                json.dumps(({'likes': likes+1, 'blog_key': data['blog_key']})))
         else:
             # liking post twice revokes like
             like.key.delete()
@@ -424,9 +425,9 @@ class LikeHandler(Handler):
             """
             if (likes-1) == 0:
                 likes = ''
-                self.response.out.write(json.dumps(({'likes': likes})))
+                self.response.out.write(json.dumps(({'likes': likes, 'blog_key': data['blog_key']})))
             else:
-                self.response.out.write(json.dumps(({'likes': likes-1})))
+                self.response.out.write(json.dumps(({'likes': likes-1, 'blog_key': data['blog_key']})))
 
 
 class CommentHandler(Handler):

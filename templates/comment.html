@@ -14,6 +14,7 @@
     {{comment._render_text | safe}}
   </div>
   {% if comment.is_owner(current_user) %}
+  <!-- This code is generated for user's own comments and it is hidden by default. It is used to edit comments. I decided not to generate this on-the-go with JQuery. Wasn't able to get values from form. -->
   <form class="small-12 column comment__edit">
     <div class="row column">
       <textarea maxlength="500" name="content" class="comment__editarea" required="required"></textarea>
@@ -29,7 +30,6 @@
       </div>
     </div>
   </form>
-
   {% endif %}
   <div class="small-12 column">
     <label>{{comment.created.strftime("%b %d, %Y")}}</label>

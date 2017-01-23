@@ -1,32 +1,17 @@
-
 body, h1, h2, h3, h4, h5, h6 {
   font-family: 'Merriweather', serif;
 }
 
-body {
+body, main, nav {
   background-color: #ededed;
-}
-
-main {
-  background-color: #ededed;
-}
-
-a {
-  color: black;
-}
-
-h1 {
-  line-height: 0.8;
 }
 
 header {
   padding-top: 2rem;
-  background-color: white;
   background-image: linear-gradient(white, #ededed);
 }
 
 nav {
-  background-color: #ededed;
   padding-bottom: 0.5rem;
 }
 
@@ -43,26 +28,20 @@ article {
   -khtml-border-radius: 0.2rem; /* for old Konqueror browsers */
 }
 
-
 article:first-of-type {
   margin-top: 1rem;
 }
 
 article:last-of-type {
-  margin-top: 1rem;
+  margin-bottom: 1rem;
 }
 
-
-.post__header {
-  padding-top: 1rem;
-  background-image: linear-gradient(#ededed, white);
-
+a {
+  color: black;
 }
 
-.post__comments {
-  padding-bottom: 1rem;
-  background-image: linear-gradient(white, #ededed);
-
+h1 {
+  line-height: 0.8;
 }
 
 .login {
@@ -89,19 +68,23 @@ article:last-of-type {
   max-width: 12rem;
 }
 
-.comment__discard, .comment__commit, .comment__editarea {
-  display: none;
+.post__header {
+  padding-top: 1rem;
+  background-image: linear-gradient(#ededed, white);
 }
 
+.post__comments {
+  padding-bottom: 1rem;
+  background-image: linear-gradient(white, #ededed);
+}
 
-.uppercase {
-  text-transform: uppercase;
+.comment__discard, .comment__commit, .comment__editarea {
+  display: none;
 }
 
 .edit__icon, .remove__icon {
   padding: 0.5rem;
   margin: 0.1rem;
-  
 }
 
 .edit__discard, .edit__delete {
@@ -115,26 +98,6 @@ article:last-of-type {
     are not yet included to CSS*/
   }
 
-.noselect {
-  -webkit-touch-callout: none; /* iOS Safari */
-    -webkit-user-select: none; /* Safari*/
-     -khtml-user-select: none; /* Konqueror */
-       -moz-user-select: none; /* Firefox */
-        -ms-user-select: none; /* Internet Explorer/Edge */
-            user-select: none; /* Non-prefixed version, currently
-                                  supported by Chrome and Opera */
-}
-
-  @media screen and (max-width: 639px) {
-    .blog__text {
-      padding: 0 0.7rem;
-    }
-
-  }
-
-  @media screen and (min-width: 640px) and (max-width: 959px) {
-    
-  }
 
   @media screen and (min-width: 50rem) {
     body {

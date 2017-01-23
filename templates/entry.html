@@ -1,4 +1,4 @@
-<article class="small-12 column">
+<article class="small-12 column" id="{{blog.key.urlsafe()}}">
   <div class="row post__header">
     <div class="small-12 column">
       <a href="/{{blog.key.parent().get().name}}/{{blog.key.id()}}"><h2>{{blog.subject}}</h2></a>
@@ -22,6 +22,7 @@
       <div class="small-6 column">
       {% if not blog.is_owner(current_user) %}
       {% if current_user is none %}
+      <!-- This means that user is not logged in -->
         <div class="row column">
           <a class="fi-heart" href="/login">
             Like
@@ -31,10 +32,11 @@
           </a>
         </div>
       {% else %}
+      <!-- If he is logged but not the author of blogpost -->
         <div class="row column">
           <a class="fi-heart" href="javascript:Like('{{blog.key.urlsafe()}}');">
             Like
-            <span>
+            <span class="likes__counter">
               {% if likes %}
                 {{likes}}
               {% endif %}
@@ -43,8 +45,9 @@
         </div>
       {% endif %}
       {% else %}
+      <!-- Current user is author, he can't like his own post -->
         <div class="row">
-          <div class="small-12 column" href="/login">
+          <div class="small-12 column">
             <button data-toggle-focus="likeError{{blog.key.id()}}" class="fi-heart">
               Like
               {% if likes %}
@@ -70,11 +73,12 @@
     <div class="small-10 column small-centered">
       {% for comment in comments %}
           {% if loop.index == 4 %}
+          <!-- If there a more than 3 comments, we hide recent ones and add a ShowMore button -->
           <div class="hide" id="hiddenComments" data-toggler=".hide">
           {% endif %}
             {{comment.render(current_user) | safe}}
           {% if loop.last and loop.index > 3 %}
-          </div class="hide">
+          </div>
           <div class="row">
             <div class="small-6 medium-3 column small-centered text-center">
               <button name="showMore" class="button hollow tiny" data-toggle="hiddenComments">Show more
@@ -84,8 +88,8 @@
           {% endif %}
       {% endfor %}
       <div class="comment__new">
-<!--       this is a temporary container for new comments
-      we recieve html via ajax-->
+      <!-- This is a container for temporary new comments
+      we recieve html via ajax -->
       </div>
       {% if current_user is none %}
       <div class="small-12 column text-center small-centered end">
@@ -101,7 +105,7 @@
           </div>
           <div class="row">
             <div class="column text-right">
-              <button type="reset" onclick="javascript:Comment(this.form.content.value,'{{blog.key.urlsafe()}}');" class="small hollow button" value="Post">Post</button>
+              <button type="reset" onclick="javascript:Comment(this.form.content.value,'{{blog.key.urlsafe()}}');" class="tiny hollow button" value="Post">Publish</button>
             </div>
           </div>
         </form>
