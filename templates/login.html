@@ -1,7 +1,16 @@
 {% extends "main.html" %}
 
 {% block content %}
-
+<nav id="menuBar" class="row expanded hide-for-small-only" data-toggler="hide-for-small-only">
+  <!--row is expanded to full vw to place gradient-->
+  <div class="row">
+    <!--div takes 100% width, so we use row class with max-width 1200px to center content-->
+    <ul class="menu small-12 column simple text-right">
+      <li><a href="/">Main page</a></li>
+      <li><a href="/signup">Signup</a></li>
+    </ul>
+  </div>
+</nav>
 <div class="row">
   <form method="post" class="login small-centered column">
     <div class="row column">
