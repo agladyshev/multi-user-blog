@@ -35,57 +35,57 @@ $("body").on("click", "button[name=comment__discard]", function () {
       $comment.find(".comment__text").show();
 });
 
-function Like(blog_key){
+function Like(blog_key) {
   $.ajax({
-    type: "POST",
-    url: "/like",
-    dataType: "json",
-    data: JSON.stringify({"blog_key": blog_key})
-  })
-  .done(function( data ) {
-      var id = data.blog_key;
-      $("#" + id).find(".likes__counter").text(data.likes);
-  });
+        type: "POST",
+        url: "/like",
+        dataType: "json",
+        data: JSON.stringify({"blog_key": blog_key})
+    })
+        .done(function (data) {
+            var id = data.blog_key;
+          $("#" + id).find(".likes__counter").text(data.likes);
+        });
 }
 
-function Comment(content, blog_key){
+function Comment(content, blog_key) {
   $.ajax({
-    type: "POST",
-    url: "/comment",
-    dataType: "json",
-    data: JSON.stringify({"content": content, "blog_key": blog_key})
-  })
-  .done(function( data ) {
-      $(".comment__new").append(data.comment);
-  });
+        type: "POST",
+        url: "/comment",
+        dataType: "json",
+        data: JSON.stringify({"content": content, "blog_key": blog_key})
+    })
+        .done(function (data) {
+            $(".comment__new").append(data.comment);
+        });
 }
 
-function DeleteComment(comment_key){
+function DeleteComment(comment_key) {
   $.ajax({
-    type: "POST",
-    url: "/comment",
-    dataType: "json",
-    data: JSON.stringify({"comment_key": comment_key})
-  })
-  .done(function( data ) {
-      var id = data.comment_key;
-      $("#" + id).hide();
-  });
+        type: "POST",
+        url: "/comment",
+        dataType: "json",
+        data: JSON.stringify({"comment_key": comment_key})
+    })
+        .done(function (data) {
+            var id = data.comment_key;
+            $("#" + id).hide();
+        });
 }
 
-function EditComment(content, comment_key){
+function EditComment(content, comment_key) {
   $.ajax({
-    type: "POST",
-    url: "/comment",
-    dataType: "json",
-    data: JSON.stringify({"content": content, "comment_key": comment_key})
-  })
-  .done(function( data ) {
-      var id = data.comment_key;
-      $("#" + id).find(".comment__editarea").hide();
-      $("#" + id).find(".comment__discard").hide();
-      $("#" + id).find(".comment__commit").hide();
-      $("#" + id).find(".comment__text").text(data.content);
-      $("#" + id).find(".comment__text").show();
+        type: "POST",
+        url: "/comment",
+        dataType: "json",
+        data: JSON.stringify({"content": content, "comment_key": comment_key})
+    })
+        .done(function (data) {
+            var id = data.comment_key;
+            $("#" + id).find(".comment__editarea").hide();
+            $("#" + id).find(".comment__discard").hide();
+            $("#" + id).find(".comment__commit").hide();
+            $("#" + id).find(".comment__text").text(data.content);
+            $("#" + id).find(".comment__text").show();
         });
 }
