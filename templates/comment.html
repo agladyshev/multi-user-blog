@@ -5,7 +5,7 @@
   <div class="small-4 column text-right">
     {% if comment.is_owner(current_user) %}
       <button class="edit__icon" name="editComment">
-      <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" viewBox="0 0 187.5 187.5" version="1"><g stroke="#000"><path d="M125.061 48.743l-74.15 74.151-5.066 18.921 17.987-4.824 74.743-74.734s6.915-6.64 0-13.514c-6.507-6.457-13.189-.308-13.514 0z" stroke-width="3.74922" fill="none"/><path d="M66.299 133.625s-3.908 1.642-5.69-.2c-1.784-1.85-.909-5.59-.909-5.59s-3.166 1.633-4.45-.217c-1.29-1.85-1.815-2.916-1.132-4.79s.166-2.666.166-2.666" stroke-width="1.91460168" fill="none"/><path d="M47.236 139.99l3.916-3.357" stroke-width="5.20725" fill="none"/><path d="M59.958 127.977c3.633-3.625 78.184-77.06 78.184-77.06" stroke-width="2.29119" fill="none"/><path transform="matrix(.59054 .12004 .3354 .68777 258.467 -71.77)" d="M-335.39 238.29a8.476 8.88 0 1 1-16.96 0 8.476 8.88 0 1 1 16.96 0z" stroke-linejoin="round" stroke-linecap="round" stroke-width="2.75"/></g></svg>
+      <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" viewBox="0 0 100 100"><path d="M88.79 29.297L70.702 11.209a2.692 2.692 0 0 0-3.808 0L17.389 60.713l.109.109-.171-.046-6.772 25.272.004.001a2.681 2.681 0 0 0 .642 2.748 2.684 2.684 0 0 0 3.033.531l.002.009 25.027-6.706-.016-.059.038.038L88.79 33.105a2.692 2.692 0 0 0 0-3.808zm-69.998 51.85l4.022-15.009 10.988 10.988-15.01 4.021z"/></svg>
       </button>
       <a class="remove__icon" href="javascript:DeleteComment('{{comment.key.urlsafe()}}');">
       <svg xmlns="http://www.w3.org/2000/svg" width="1rem" height="1rem" viewBox="0 0 100 100"><path d="M84.707 68.752L65.951 49.998l18.75-18.752a1.989 1.989 0 0 0 0-2.813L71.566 15.295a1.99 1.99 0 0 0-2.814 0L49.999 34.047l-18.75-18.752c-.746-.747-2.067-.747-2.814 0L15.297 28.431a1.992 1.992 0 0 0 0 2.814L34.05 49.998 15.294 68.753a1.993 1.993 0 0 0 0 2.814L28.43 84.704a1.988 1.988 0 0 0 2.814 0l18.755-18.755 18.756 18.754c.389.388.896.583 1.407.583s1.019-.195 1.408-.583l13.138-13.137a1.99 1.99 0 0 0-.001-2.814z"/></svg>
@@ -16,17 +16,19 @@
     {{comment._render_text | safe}}
   </div>
   {% if comment.is_owner(current_user) %}
-  <form class="small-12 column">
+  <form class="small-12 column comment__edit">
     <div class="row column">
       <textarea maxlength="500" name="content" class="comment__editarea" required="required"></textarea>
     </div>
-    <div class="small-6 medium-push-8 medium-2 large-push-10 large-1 column text-center ">
-      <button class="button tiny warning comment__discard" value="Discard changes">Discard
-      </button>
-    </div>
-    <div class="small-6 medium-2 large-1 column text-center ">
-      <button class="button tiny comment__commit" onclick="javascript:EditComment(this.form.content.value, '{{comment.key.urlsafe()}}');" value="Commit changes" type="reset">Commit
-      </button>
+    <div class="row">
+      <div class="small-6 column text-left">
+        <button class="button tiny warning comment__discard" value="Discard changes" type="reset" name="comment__discard">Discard
+        </button>
+      </div>
+      <div class="small-6 column text-right">
+        <button class="button tiny comment__commit" onclick="javascript:EditComment(this.form.content.value, '{{comment.key.urlsafe()}}');" value="Commit changes" type="reset">Commit
+        </button>
+      </div>
     </div>
   </form>
 

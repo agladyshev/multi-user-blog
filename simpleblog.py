@@ -3,9 +3,9 @@ import webapp2
 import jinja2
 import re
 import random
-import logging
 import hmac
 import json
+import logging
 from string import letters
 from pybcrypt import bcrypt
 
@@ -483,9 +483,7 @@ class LikeHandler(Handler):
         self.error(404)
         return
 
-
     def post(self):
-        # logging.debug(self.request.body)
         data = json.loads(self.request.body)
         blog_key = ndb.Key(urlsafe=data['blog_key'])
         user_key_ndb = get_user_key(self.user.key.id())
@@ -501,9 +499,9 @@ class LikeHandler(Handler):
             if (likes-1) == 0:
                 likes = ''
                 self.response.out.write(json.dumps(({'likes': likes})))
-            self.response.out.write(json.dumps(({'likes': likes-1})))
+            else:
+                self.response.out.write(json.dumps(({'likes': likes-1})))
 
-        logging.debug(likes)
 
 
 class CommentHandler(Handler):
@@ -512,25 +510,23 @@ class CommentHandler(Handler):
         self.error(404)
         return
 
-
     def post(self):
         # think about escaping input
 
         data = json.loads(self.request.body)
-        # logging.debug(data['blog_key'])
-        # logging.debug(data['content'])
-        logging.debug("1")
-
 
         if 'blog_key' in data:
-            #new comment
-            logging.debug("newcomment")
+            # new comment
             blog_key = ndb.Key(urlsafe=data['blog_key'])
             content = data['content']
             user_key_ndb = get_user_key(self.user.key.id())
             if content:
-                c = Comment(parent=user_key_ndb, blog=blog_key, content=content)
+                c = Comment(
+                    parent=user_key_ndb, blog=blog_key, content=content)
+                
                 comment = c.put()
+
+                # logging.debug(comment)
 
                 comment_html = comment.get().render(self.user)
                 """
@@ -538,25 +534,29 @@ class CommentHandler(Handler):
                 updating/deleting dynamic objects
 
                 """
-                logging.debug(comment_html)
 
                 # newcomment = {'author': self.user.name, 'content': content}
-                self.response.out.write(json.dumps(({'comment': comment_html})))
+                self.response.out.write(
+                    json.dumps(({'comment': comment_html})))
         else:
             if 'content' in data:
-                logging.debug("3")
-                #edit comment
+                # edit comment
+                
                 comment_key = ndb.Key(urlsafe=data['comment_key'])
+                logging.debug(comment_key)
                 c = comment_key.get()
+                logging.debug(c)
                 c.content = data['content']
                 c.put()
-                self.response.out.write(json.dumps(({'comment_key': data['comment_key'], 'content': c.content})))  
+                self.response.out.write(
+                    json.dumps(({'comment_key': data['comment_key'],
+                                 'content': c.content})))
             else:
-                logging.debug("2")
-                #delete comment
+                # delete comment
                 comment_key = ndb.Key(urlsafe=data['comment_key'])
                 comment_key.delete()
-                self.response.out.write(json.dumps(({'comment_key': data['comment_key']})))  
+                self.response.out.write(
+                    json.dumps(({'comment_key': data['comment_key']})))
 
 
 app = webapp2.WSGIApplication([('/', MainPage),
