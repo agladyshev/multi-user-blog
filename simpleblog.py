@@ -500,7 +500,8 @@ class LikeHandler(Handler):
             likes = blog_key.get().get_likes()
             if (likes-1) == 0:
                 likes = ''
-            self.response.out.write(json.dumps(({'likes': likes})))
+                self.response.out.write(json.dumps(({'likes': likes})))
+            self.response.out.write(json.dumps(({'likes': likes-1})))
 
         logging.debug(likes)
 
@@ -525,9 +526,6 @@ class CommentHandler(Handler):
             #new comment
             logging.debug("newcomment")
             blog_key = ndb.Key(urlsafe=data['blog_key'])
-
-            
-
             content = data['content']
             user_key_ndb = get_user_key(self.user.key.id())
             if content:
