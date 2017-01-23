@@ -63,7 +63,7 @@
       $(document).foundation();
     </script>
     <script>
-      $('button[name=showMore]')
+      $("button[name=showMore]")
       .click(
            function ()
            {
@@ -74,30 +74,70 @@
           $.ajax({
             type: "POST",
             url: "/like",
-            dataType: 'json',
+            dataType: "json",
             data: JSON.stringify({ "blog_key": blog_key})
           })
           .done(function( data ) {
-              $('.likes__counter').text(data['likes']);
+              $(".likes__counter").text(data.likes);
           });
       };
       function Comment(content, blog_key){
           $.ajax({
             type: "POST",
             url: "/comment",
-            dataType: 'json',
+            dataType: "json",
             data: JSON.stringify({"content": content, "blog_key": blog_key})
           })
           .done(function( data ) {
-              // $('.comment__new').text(data['comment']);
-              // $('.comment__content').text(data['comment']['content']);
-              // $('.comment__author').text(data['comment']['author']);
-              // $('.comment__time').text('just now');
-
-              $('.comment__new').append(data['comment']);
+              $(".comment__new").append(data["comment"]);
           });
       };
-      // $('comment_new:empty').hide();
+      function DeleteComment(comment_key){
+          $.ajax({
+            type: "POST",
+            url: "/comment",
+            dataType: "json",
+            data: JSON.stringify({"comment_key": comment_key})
+          })
+          .done(function( data ) {
+              var id = data["comment_key"];
+              $("#" + id).hide();
+          });
+      };
+
+      $('body').on("click", "button[name=editComment]", function() {
+              $comment = $(this).parent().parent();
+              $textarea = $comment.find(".comment__text");
+              $commit = $comment.find(".comment__commit");
+              $discard = $comment.find(".comment__discard");
+              $editarea = $comment.find(".comment__editarea");
+              text = $textarea.text()
+              $editarea.text(text)
+              $textarea.hide();
+              $commit.show();
+              $discard.show();
+              $editarea.show();
+           }
+        );
+
+      function EditComment(content, comment_key){
+          $.ajax({
+            type: "POST",
+            url: "/comment",
+            dataType: "json",
+            data: JSON.stringify({"content": content, "comment_key": comment_key})
+          })
+          .done(function( data ) {
+            console.log("done")
+              var id = data["comment_key"];
+              $("#" + id).find(".comment__editarea").hide();
+              $("#" + id).find(".comment__discard").hide();
+              $("#" + id).find(".comment__commit").hide();
+
+              $("#" + id).find(".comment__text").text(data["content"]);
+              $("#" + id).find(".comment__text").show();
+          });
+      };
     </script>
 
   </body>

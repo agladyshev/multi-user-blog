@@ -48,6 +48,10 @@ article {
   padding-top: 1rem;
 }
 
+/*form {
+  background-color: red;
+}*/
+
 
 .blog {
   background-color: white;
@@ -77,6 +81,12 @@ article {
   display:none;
 }
 */
+
+.comment__discard, .comment__commit, .comment__editarea {
+  display: none;
+}
+
+
 .uppercase {
   text-transform: uppercase;
 }

@@ -179,12 +179,10 @@ class Comment(ndb.Model):
     created = ndb.DateTimeProperty(auto_now_add=True)
 
     def is_owner(self, current_user=None):
-        logging.debug(current_user)
         if current_user:
             return self.key.parent() == current_user.key
 
     def render(self, current_user=None):
-        logging.debug(current_user)
         self._render_text = self.content.replace('\n', '<br>')
         return render_str("comment.html",
                           comment=self,
@@ -481,6 +479,11 @@ class EditPost(Handler):
 
 class LikeHandler(Handler):
 
+    def get(self):
+        self.error(404)
+        return
+
+
     def post(self):
         # logging.debug(self.request.body)
         data = json.loads(self.request.body)
@@ -504,25 +507,58 @@ class LikeHandler(Handler):
 
 class CommentHandler(Handler):
 
+    def get(self):
+        self.error(404)
+        return
+
+
     def post(self):
         # think about escaping input
 
         data = json.loads(self.request.body)
         # logging.debug(data['blog_key'])
         # logging.debug(data['content'])
-        blog_key = ndb.Key(urlsafe=data['blog_key'])
+        logging.debug("1")
 
-        content = data['content']
-        user_key_ndb = get_user_key(self.user.key.id())
-        if content:
-            c = Comment(parent=user_key_ndb, blog=blog_key, content=content)
-            comment = c.put()
 
-            comment_html = comment.get().render(self.user)
-            logging.debug(comment_html)
+        if 'blog_key' in data:
+            #new comment
+            logging.debug("newcomment")
+            blog_key = ndb.Key(urlsafe=data['blog_key'])
 
-            # newcomment = {'author': self.user.name, 'content': content}
-            self.response.out.write(json.dumps(({'comment': comment_html})))
+            
+
+            content = data['content']
+            user_key_ndb = get_user_key(self.user.key.id())
+            if content:
+                c = Comment(parent=user_key_ndb, blog=blog_key, content=content)
+                comment = c.put()
+
+                comment_html = comment.get().render(self.user)
+                """
+                we render new comments without current_user to avoid
+                updating/deleting dynamic objects
+
+                """
+                logging.debug(comment_html)
+
+                # newcomment = {'author': self.user.name, 'content': content}
+                self.response.out.write(json.dumps(({'comment': comment_html})))
+        else:
+            if 'content' in data:
+                logging.debug("3")
+                #edit comment
+                comment_key = ndb.Key(urlsafe=data['comment_key'])
+                c = comment_key.get()
+                c.content = data['content']
+                c.put()
+                self.response.out.write(json.dumps(({'comment_key': data['comment_key'], 'content': c.content})))  
+            else:
+                logging.debug("2")
+                #delete comment
+                comment_key = ndb.Key(urlsafe=data['comment_key'])
+                comment_key.delete()
+                self.response.out.write(json.dumps(({'comment_key': data['comment_key']})))  
 
 
 app = webapp2.WSGIApplication([('/', MainPage),
