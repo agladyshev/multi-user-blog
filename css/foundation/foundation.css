@@ -3908,12 +3908,12 @@ a.thumbnail {
     display: block;
     width: 100%;
     height: 2px;
-    background: #fefefe;
-    box-shadow: 0 7px 0 #fefefe, 0 14px 0 #fefefe;
+    background: #333333;
+    box-shadow: 0 7px 0 #333333, 0 14px 0 #333333;
     content: ''; }
   .menu-icon:hover::after {
-    background: #cacaca;
-    box-shadow: 0 7px 0 #cacaca, 0 14px 0 #cacaca; }
+    background: #222222;
+    box-shadow: 0 7px 0 #222222, 0 14px 0 #222222; }
 
 .menu-icon.dark {
   position: relative;
