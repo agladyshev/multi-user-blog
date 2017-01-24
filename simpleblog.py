@@ -156,7 +156,7 @@ class Blog(ndb.Model):
     def by_id(cls, blog_id, user_id):
         """
         We can't retrieve blog by id only because id is not unique.
-        Ids are used as a part of url, alongside with the author name 
+        Ids are used as a part of url, alongside with the author name
 
         """
         parent = get_user_key(user_id)
@@ -223,6 +223,8 @@ class NewPost(Handler):
             self.redirect("/login")
 
     def post(self):
+        if not self.user:
+            self.redirect("/login")
         subject = self.request.get("subject")
         content = self.request.get("content")
         if subject and content:
@@ -374,6 +376,9 @@ class EditPost(Handler):
         u = User.by_name(author)
         user_id = u.key.id()
         blog = Blog.by_id(int(blog_id), int(user_id))
+        if not blog.is_owner(self.user):
+            self.error(401)
+            return
         if subject and content:
             blog.subject = subject
             blog.content = content
@@ -405,6 +410,10 @@ class LikeHandler(Handler):
         key of the post we want to like through JSON object
         """
         blog_key = ndb.Key(urlsafe=data['blog_key'])
+        blog = blog_key.get()
+        if blog.is_owner(self.user):
+            self.error(401)
+            return
         # Check if user has already liked the blog
         like = Like.get_user_like(user_key=self.user.key, blog_key=blog_key)
         if not like:
@@ -426,9 +435,13 @@ class LikeHandler(Handler):
             """
             if (likes-1) == 0:
                 likes = ''
-                self.response.out.write(json.dumps(({'likes': likes, 'blog_key': data['blog_key']})))
+                self.response.out.write(
+                    json.dumps(({'likes': likes,
+                                 'blog_key': data['blog_key']})))
             else:
-                self.response.out.write(json.dumps(({'likes': likes-1, 'blog_key': data['blog_key']})))
+                self.response.out.write(
+                    json.dumps(({'likes': likes-1,
+                                 'blog_key': data['blog_key']})))
 
 
 class CommentHandler(Handler):
@@ -442,6 +455,8 @@ class CommentHandler(Handler):
         This method is used for all operations with comments:
         create new, delete or edit
         """
+        if not self.user:
+            self.redirect("/login")
         data = json.loads(self.request.body)
         if 'blog_key' in data:
             # Means user posting new comment
@@ -461,14 +476,22 @@ class CommentHandler(Handler):
                 # update comment
                 comment_key = ndb.Key(urlsafe=data['comment_key'])
                 c = comment_key.get()
-                c.content = data['content']
-                c.put()
-                self.response.out.write(
-                    json.dumps(({'comment_key': data['comment_key'],
+                if c:
+                    if not c.is_owner(self.user):
+                        self.error(401)
+                        return
+                    c.content = data['content']
+                    c.put()
+                    self.response.out.write(
+                        json.dumps(({'comment_key': data['comment_key'],
                                  'content': c.content})))
             else:
                 # delete comment
                 comment_key = ndb.Key(urlsafe=data['comment_key'])
+                c = comment_key.get()
+                if not c.is_owner(self.user):
+                        self.error(401)
+                        return
                 comment_key.delete()
                 self.response.out.write(
                     json.dumps(({'comment_key': data['comment_key']})))
