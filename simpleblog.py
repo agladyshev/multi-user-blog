@@ -1,45 +1,12 @@
-import os
 import webapp2
-import jinja2
 import re
-import random
-import hmac
 import json
+import random
 from string import letters
-from passlib.hash import pbkdf2_sha256
-
+import models
+import core
 
 from google.appengine.ext import ndb
-
-
-template_dir = os.path.join(os.path.dirname(__file__), 'templates')
-jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_dir),
-                               autoescape=True)
-
-secret = 'QM8DcZ8ThA7*se9MIyqFCBbV8A3QTU5!4DgD508Cq268Th42'
-
-
-def render_str(template, **params):
-    t = jinja_env.get_template(template)
-    return t.render(params)
-
-
-def make_secure_val(val):
-    return '%s|%s' % (val, hmac.new(secret, val).hexdigest())
-
-
-def check_secure_val(secure_val):
-    val = secure_val.split('|')[0]
-    if secure_val == make_secure_val(val):
-        return val
-
-
-def make_pw_hash(password):
-    return pbkdf2_sha256.hash(password)
-
-
-def valid_pw(password, hashed):
-    return pbkdf2_sha256.verify(password, hashed)
 
 
 class Handler(webapp2.RequestHandler):
@@ -48,21 +15,22 @@ class Handler(webapp2.RequestHandler):
         self.response.out.write(*a, **kw)
 
     def render_str(self, template, **params):
-        t = jinja_env.get_template(template)
-        return t.render(params)
+        # t = jinja_env.get_template(template)
+        # return t.render(params)
+        return core.render_str(template, **params)
 
     def render(self, template, **kw):
         self.write(self.render_str(template, **kw))
 
     def set_secure_cookie(self, name, val):
-        cookie_val = make_secure_val(val)
+        cookie_val = core.make_secure_val(val)
         self.response.headers.add_header(
             'Set-Cookie',
             '%s=%s; Path=/' % (name, cookie_val))
 
     def read_secure_cookie(self, name):
         cookie_val = self.request.cookies.get(name)
-        return cookie_val and check_secure_val(cookie_val)
+        return cookie_val and core.check_secure_val(cookie_val)
 
     def login(self, user):
         self.set_secure_cookie('user_id', str(user.key.id()))
@@ -73,140 +41,13 @@ class Handler(webapp2.RequestHandler):
     def initialize(self, *a, **kw):
         webapp2.RequestHandler.initialize(self, *a, **kw)
         uid = self.read_secure_cookie('user_id')
-        self.user = uid and User.by_id(int(uid))
-
-
-# Ndb models
-
-def users_key(group='default'):
-    # default root entity
-    return ndb.Key('users', group)
-
-
-def get_user_key(user_id):
-    """
-    All user entities are child ent. of default root entity
-    Blogs, comments and likes are child entities of user entities
-    """
-    return ndb.Key(User, user_id, parent=users_key())
-
-
-class User(ndb.Model):
-    name = ndb.StringProperty(required=True)
-    pw_hash = ndb.StringProperty(required=True)
-    email = ndb.StringProperty()
-    created = ndb.DateTimeProperty(auto_now_add=True)
-
-    @classmethod
-    def by_id(cls, uid):
-        return cls.get_by_id(uid, parent=users_key())
-
-    @classmethod
-    def by_name(cls, name):
-        u = cls.query().filter(User.name == name).get()
-        return u
-
-    @classmethod
-    def register(cls, name, password, email=None):
-        pw_hash = make_pw_hash(password)
-        return cls(parent=users_key(),
-                   name=name,
-                   pw_hash=pw_hash,
-                   email=email)
-
-    @classmethod
-    def login(cls, name, password):
-        u = cls.by_name(name)
-        if u and valid_pw(password, u.pw_hash):
-            return u
-
-
-class Blog(ndb.Model):
-    subject = ndb.StringProperty(required=True)
-    content = ndb.TextProperty(required=True)
-    created = ndb.DateTimeProperty(auto_now_add=True)
-    last_modified = ndb.DateTimeProperty(auto_now=True)
-
-    def get_comments(self):
-        blog_key = self.key
-        c = Comment.by_blog_key(blog_key)
-        return c
-
-    def get_likes(self):
-        blog_key = self.key
-        l = Like.by_blog_key(blog_key)
-        return l.count()
-
-    def is_owner(self, current_user=None):
-        if current_user:
-            return self.key.parent() == current_user.key
-
-    def render(self, current_user=None):
-        # current_user is none if user is not authenticated
-        self._render_text = self.content.replace('\n', '<br>')
-        comments = self.get_comments()
-        likes = self.get_likes()
-        return render_str("entry.html",
-                          blog=self,
-                          comments=comments,
-                          likes=likes,
-                          current_user=current_user)
-
-    @classmethod
-    def by_id(cls, blog_id, user_id):
-        """
-        We can't retrieve blog by id only because id is not unique.
-        Ids are used as a part of url, alongside with the author name
-
-        """
-        parent = get_user_key(user_id)
-        return cls.get_by_id(blog_id, parent=parent)
-
-
-class Comment(ndb.Model):
-    blog = ndb.KeyProperty(kind=Blog, required=True)
-    content = ndb.StringProperty(required=True)
-    created = ndb.DateTimeProperty(auto_now_add=True)
-
-    def is_owner(self, current_user=None):
-        if current_user:
-            return self.key.parent() == current_user.key
-
-    def render(self, current_user=None):
-        self._render_text = self.content.replace('\n', '<br>')
-        return render_str("comment.html",
-                          comment=self,
-                          current_user=current_user)
-
-    @classmethod
-    def by_blog_key(cls, blog_key):
-        comments = cls.query().filter(
-            Comment.blog == blog_key).order(Comment.created)
-        return comments
-
-
-class Like(ndb.Model):
-    blog = ndb.KeyProperty(kind=Blog, required=True)
-
-    @classmethod
-    def by_id(cls, uid):
-        return cls.get_by_id(uid)
-
-    @classmethod
-    def by_blog_key(cls, blog_key):
-        likes = cls.query().filter(Like.blog == blog_key)
-        return likes
-
-    @classmethod
-    def get_user_like(cls, user_key, blog_key):
-        # Checks if user has liked blog already, return object or null
-        return cls.query(ancestor=user_key).filter(Like.blog == blog_key).get()
+        self.user = uid and models.User.by_id(int(uid))
 
 
 class MainPage(Handler):
 
     def render_main(self):
-        blogs = Blog.query().order(-Blog.created)
+        blogs = models.Blog.query().order(-models.Blog.created)
         self.render(
             "blog.html", blogs=blogs, current_user=self.user)
 
@@ -228,8 +69,8 @@ class NewPost(Handler):
         subject = self.request.get("subject")
         content = self.request.get("content")
         if subject and content:
-            user_key = get_user_key(self.user.key.id())
-            b = Blog(subject=subject, content=content, parent=user_key)
+            user_key = models.get_user_key(self.user.key.id())
+            b = models.Blog(subject=subject, content=content, parent=user_key)
             b.put()
             """
             We create new URL for post
@@ -251,9 +92,9 @@ class PostPage(Handler):
         When you use REGEX in url, app sends strings as a parameter
         to the get or post methods
         """
-        u = User.by_name(author)
+        u = models.User.by_name(author)
         user_id = u.key.id()
-        blog = Blog.by_id(int(blog_id), int(user_id))
+        blog = models.Blog.by_id(int(blog_id), int(user_id))
         if not blog:
             self.error(404)
             return
@@ -306,12 +147,12 @@ class Register(Handler):
 
     def success(self):
         # making sure user doesn't already exist
-        u = User.by_name(self.name)
+        u = models.User.by_name(self.name)
         if u:
             self.render("signup.html",
-                        username_error="User with that name already exists")
+                        username_error="models.User with that name already exists")
         else:
-            u = User.register(name=self.name,
+            u = models.User.register(name=self.name,
                               password=self.password,
                               email=self.email)
             u.put()
@@ -328,7 +169,7 @@ class Login(Handler):
         name = self.request.get("name")
         password = self.request.get("password")
         # authenticate
-        u = User.login(name, password)
+        u = models.User.login(name, password)
         if u:
             # update cookies
             self.login(u)
@@ -357,9 +198,9 @@ class WelcomePage(Handler):
 class EditPost(Handler):
 
     def get(self, author, blog_id):
-        u = User.by_name(author)
+        u = models.User.by_name(author)
         user_id = u.key.id()
-        blog = Blog.by_id(int(blog_id), int(user_id))
+        blog = models.Blog.by_id(int(blog_id), int(user_id))
         if not blog:
             self.error(404)
             return
@@ -373,9 +214,9 @@ class EditPost(Handler):
     def post(self, author, blog_id):
         subject = self.request.get("subject")
         content = self.request.get("content")
-        u = User.by_name(author)
+        u = models.User.by_name(author)
         user_id = u.key.id()
-        blog = Blog.by_id(int(blog_id), int(user_id))
+        blog = models.Blog.by_id(int(blog_id), int(user_id))
         if not blog.is_owner(self.user):
             self.error(401)
             return
@@ -415,11 +256,11 @@ class LikeHandler(Handler):
             self.error(401)
             return
         # Check if user has already liked the blog
-        like = Like.get_user_like(user_key=self.user.key, blog_key=blog_key)
+        like = models.Like.get_user_like(user_key=self.user.key, blog_key=blog_key)
         if not like:
             # Create parent key for new like
-            user_key_ndb = get_user_key(self.user.key.id())
-            like = Like(parent=user_key_ndb, blog=blog_key)
+            user_key_ndb = models.get_user_key(self.user.key.id())
+            like = models.Like(parent=user_key_ndb, blog=blog_key)
             like.put()
             likes = blog_key.get().get_likes()
             self.response.out.write(
@@ -462,9 +303,9 @@ class CommentHandler(Handler):
             # Means user posting new comment
             blog_key = ndb.Key(urlsafe=data['blog_key'])
             content = data['content']
-            user_key_ndb = get_user_key(self.user.key.id())
+            user_key_ndb = models.get_user_key(self.user.key.id())
             if content:
-                c = Comment(
+                c = models.Comment(
                     parent=user_key_ndb, blog=blog_key, content=content)
                 comment = c.put()
                 # We create same comment html for temporary object to display

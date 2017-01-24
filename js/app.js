@@ -18,7 +18,6 @@ $("body").on("click", "button[name=editComment]", function() {
       $discard = $comment.find(".comment__discard");
       $editarea = $comment.find(".comment__editarea");
       text = $textarea.text().trim();
-      
       $editarea.text(text);
       $textarea.hide();
       $commit.show();
