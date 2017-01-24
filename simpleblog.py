@@ -6,7 +6,8 @@ import random
 import hmac
 import json
 from string import letters
-from pybcrypt import bcrypt
+from passlib.hash import pbkdf2_sha256
+
 
 from google.appengine.ext import ndb
 
@@ -34,11 +35,11 @@ def check_secure_val(secure_val):
 
 
 def make_pw_hash(password):
-    return bcrypt.hashpw(password, bcrypt.gensalt())
+    return pbkdf2_sha256.hash(password)
 
 
 def valid_pw(password, hashed):
-    return hashed == bcrypt.hashpw(password, hashed)
+    return pbkdf2_sha256.verify(password, hashed)
 
 
 class Handler(webapp2.RequestHandler):
