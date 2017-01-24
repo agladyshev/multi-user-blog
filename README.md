@@ -10,7 +10,7 @@ Multi-user blog is a simple web application. It allows you to:
 The frontend is built with a use of Foundation framework.
 App runs on Google App Engine and written on Python, some fun and dynamic action utilizes AJAX and JQuery.
 
-You can visit live app here:
+You can visit live app here: https://suchgreatbloge.appspot.com/
 
 To run app locally you will need:
 - Install Python 2.7
