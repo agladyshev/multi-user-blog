@@ -66,6 +66,7 @@ class NewPost(Handler):
     def post(self):
         if not self.user:
             self.redirect("/login")
+            return
         subject = self.request.get("subject")
         content = self.request.get("content")
         if subject and content:
@@ -226,14 +227,8 @@ class EditPost(Handler):
             blog.put()
             self.redirect("/%s/%d" % (author, int(blog_id)))
         else:
-            # this is additional backend check for ownership
-            # before deleting content
-            if blog.is_owner(self.user):
-                blog.key.delete()
-                self.redirect("/")
-            else:
-                self.error(401)
-                return
+            blog.key.delete()
+            self.redirect("/")
 
 
 class LikeHandler(Handler):
@@ -298,6 +293,7 @@ class CommentHandler(Handler):
         """
         if not self.user:
             self.redirect("/login")
+            return
         data = json.loads(self.request.body)
         if 'blog_key' in data:
             # Means user posting new comment
@@ -313,29 +309,24 @@ class CommentHandler(Handler):
                 self.response.out.write(
                     json.dumps(({'comment': comment_html})))
         else:
-            if 'content' in data:
-                # update comment
-                comment_key = ndb.Key(urlsafe=data['comment_key'])
-                c = comment_key.get()
-                if c:
-                    if not c.is_owner(self.user):
-                        self.error(401)
-                        return
-                    c.content = data['content']
-                    c.put()
-                    self.response.out.write(
-                        json.dumps(({'comment_key': data['comment_key'],
-                                 'content': c.content})))
-            else:
-                # delete comment
-                comment_key = ndb.Key(urlsafe=data['comment_key'])
-                c = comment_key.get()
+            comment_key = ndb.Key(urlsafe=data['comment_key'])
+            c = comment_key.get()
+            if c:
                 if not c.is_owner(self.user):
-                        self.error(401)
-                        return
-                comment_key.delete()
-                self.response.out.write(
-                    json.dumps(({'comment_key': data['comment_key']})))
+                            self.error(401)
+                            return
+                if 'content' in data:
+                    # update comment
+                        c.content = data['content']
+                        c.put()
+                        self.response.out.write(
+                            json.dumps(({'comment_key': data['comment_key'],
+                                     'content': c.content})))
+                else:
+                    # delete comment
+                    comment_key.delete()
+                    self.response.out.write(
+                        json.dumps(({'comment_key': data['comment_key']})))
 
 
 app = webapp2.WSGIApplication([('/', MainPage),
