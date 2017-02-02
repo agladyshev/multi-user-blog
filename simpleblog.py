@@ -259,7 +259,7 @@ class LikeHandler(Handler):
             like.put()
             likes = blog_key.get().get_likes()
             self.response.out.write(
-                json.dumps(({'likes': likes+1, 'blog_key': data['blog_key']})))
+                json.dumps(({'likes': likes, 'blog_key': data['blog_key']})))
         else:
             # liking post twice revokes like
             like.key.delete()
@@ -269,14 +269,14 @@ class LikeHandler(Handler):
             We would post temporary count as text
             So we want to be sure it is not 0
             """
-            if (likes-1) == 0:
+            if likes == 0:
                 likes = ''
                 self.response.out.write(
                     json.dumps(({'likes': likes,
                                  'blog_key': data['blog_key']})))
             else:
                 self.response.out.write(
-                    json.dumps(({'likes': likes-1,
+                    json.dumps(({'likes': likes,
                                  'blog_key': data['blog_key']})))
 
 
